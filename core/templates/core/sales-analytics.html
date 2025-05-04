@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Analytics - KGL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="w-64 bg-teal-700 text-white flex flex-col fixed inset-y-0 left-0">
+            <div class="p-6">
+                <img src="imgs/Logos/2.png" alt="Karibu Groceries Limited logo" class="h-12">
+                <h2 class="text-xl font-bold mt-4">Director's Dashboard</h2>
+            </div>
+
+            <nav class="flex-1 px-4 space-y-2">
+                <a href="reports.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-teal-800">
+                    <span>Reports Dashboard</span>
+                </a>
+                <a href="business-overview.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-teal-800">
+                    <span>Business Overview</span>
+                </a>
+                <a href="sales-analytics.html" class="flex items-center px-4 py-2 bg-teal-800 rounded">
+                    <span>Sales Analytics</span>
+                </a>
+                <a href="inventory-status.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-teal-800">
+                    <span>Inventory Status</span>
+                </a>
+                <a href="financial-reports.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-teal-800">
+                    <span>Financial Reports</span>
+                </a>
+            </nav>
+
+            <div class="p-4">
+                <a href="index.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-red-700">
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 ml-64 overflow-y-auto">
+            <header class="bg-white shadow-sm">
+                <div class="max-w-7xl mx-auto py-4 px-6">
+                    <div class="flex justify-between items-center">
+                        <h1 class="text-2xl font-bold text-gray-900">Sales Analytics</h1>
+                        <div class="flex items-center space-x-4">
+                            <select id="timeRange" name="period" onchange="this.form.submit()" class="border rounded-md px-4 py-2">
+                                <option value="today" {% if selected_period == 'today' %}selected{% endif %}>Today</option>
+                                <option value="today" {% if selected_period == 'this_week' %}selected{% endif %}>This Week</option>
+                                <option value="today" {% if selected_period == 'this_month' %}selected{% endif %}>This Month</option>
+                                <option value="today" {% if selected_period == 'this_year' %}selected{% endif %}>This Year</option>
+                            </select>
+                            <button type="submit" name="download" value="true" class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700">
+                                Download Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="max-w-7xl mx-auto py-6 px-6">
+                <!-- Sales Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Total Sales</h3>
+                        <p class="text-2xl font-bold text-gray-900" id="totalSales">UGX 0</p>
+                        <p class="text-sm text-green-600">+12.5% vs last period</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Orders</h3>
+                        <p class="text-2xl font-bold text-gray-900" id="totalOrders">0</p>
+                        <p class="text-sm text-green-600">+8.2% vs last period</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Average Order Value</h3>
+                        <p class="text-2xl font-bold text-gray-900" id="avgOrderValue">UGX 0</p>
+                        <p class="text-sm text-green-600">+5.1% vs last period</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Conversion Rate</h3>
+                        <p class="text-2xl font-bold text-gray-900">68%</p>
+                        <p class="text-sm text-green-600">+2.3% vs last period</p>
+                    </div>
+                </div>
+
+                <!-- Sales Charts -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4">Sales Trend</h3>
+                        <canvas id="salesTrendChart"></canvas>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4">Sales by Product</h3>
+                        <canvas id="salesByProductChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Sales Analysis -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4">Top Selling Products</h3>
+                        <div class="space-y-4" id="topProducts">
+                            <!-- Top products will be populated dynamically -->
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4">Sales by Time</h3>
+                        <canvas id="salesByTimeChart"></canvas>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Initialize data when page loads
+        window.onload = function() {
+            updateSalesData();
+            initializeCharts();
+        };
+
+        function updateSalesData() {
+            // Get sales data from localStorage
+            const sales = JSON.parse(localStorage.getItem('sales')) || [];
+            
+            // Calculate and update total sales
+            const totalSales = sales.reduce((sum, sale) => sum + sale.amount, 0);
+            document.getElementById('totalSales').textContent = `UGX ${totalSales.toLocaleString()}`;
+            
+            // Update total orders
+            document.getElementById('totalOrders').textContent = sales.length.toString();
+            
+            // Calculate and update average order value
+            const avgOrderValue = sales.length > 0 ? totalSales / sales.length : 0;
+            document.getElementById('avgOrderValue').textContent = `UGX ${avgOrderValue.toLocaleString()}`;
+
+            // Update top products
+            updateTopProducts(sales);
+        }
+
+        function updateTopProducts(sales) {
+            // Group sales by product and calculate total amount
+            const productTotals = {};
+            sales.forEach(sale => {
+                if (!productTotals[sale.product]) {
+                    productTotals[sale.product] = 0;
+                }
+                productTotals[sale.product] += sale.amount;
+            });
+
+            // Sort products by total amount
+            const sortedProducts = Object.entries(productTotals)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 5);
+
+            // Update the DOM
+            const topProductsDiv = document.getElementById('topProducts');
+            topProductsDiv.innerHTML = sortedProducts.map(([product, amount]) => `
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-900 font-medium">${product}</span>
+                    <span class="text-green-600 font-medium">UGX ${amount.toLocaleString()}</span>
+                </div>
+            `).join('');
+        }
+
+        function initializeCharts() {
+            // Sales Trend Chart
+            const salesTrendCtx = document.getElementById('salesTrendChart').getContext('2d');
+            new Chart(salesTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Sales',
+                        data: [12000000, 19000000, 15000000, 25000000, 22000000, 30000000],
+                        borderColor: 'rgb(13, 148, 136)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+
+            // Sales by Product Chart
+            const salesByProductCtx = document.getElementById('salesByProductChart').getContext('2d');
+            new Chart(salesByProductCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Beans', 'Maize', 'G-nuts', 'Cow peas', 'Soy beans'],
+                    datasets: [{
+                        data: [30, 25, 20, 15, 10],
+                        backgroundColor: [
+                            'rgb(13, 148, 136)',
+                            'rgb(59, 130, 246)',
+                            'rgb(245, 158, 11)',
+                            'rgb(139, 92, 246)',
+                            'rgb(239, 68, 68)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Sales by Time Chart
+            const salesByTimeCtx = document.getElementById('salesByTimeChart').getContext('2d');
+            new Chart(salesByTimeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Morning', 'Afternoon', 'Evening'],
+                    datasets: [{
+                        label: 'Sales by Time of Day',
+                        data: [15000000, 25000000, 20000000],
+                        backgroundColor: 'rgb(13, 148, 136)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Handle time range changes
+        document.getElementById('timeRange').addEventListener('change', function(e) {
+            updateSalesData();
+            // You would typically fetch new data here based on the selected range
+        });
+    </script>
+</body>
+</html> 

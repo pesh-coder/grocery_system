@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %} Dashboard - KGL {% endblock %}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            screens: {
+              'xs': '480px'
+            }
+          }
+        }
+      }
+    </script>
+</head>
+
+<body class="bg-gray-100 overflow-y-auto h-screen scroll-smooth">
+
+    <div class="flex min-h-screen overflow-x-hidden">
+      <div class="w-64 bg-teal-700 text-white flex flex-col fixed inset-y-0 left-0">
+        <div class="p-6">
+            <img src="/static/imgs/2.png/" alt="Karibu Groceries Limited logo" class="h-90">
+        </div>
+
+        <nav class="space-y-1 flex-1 overflow-y-auto">
+            {% if request.user.user_type != 'admin' %}
+            <a href="/dashboard2/" class="flex items-center px-6 py-2 hover:bg-teal-800">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25" />
+                  </svg>                          
+                   <span class="ml-1">Dashboard</span>
+            </a>
+            {% endif %}
+            {% if request.user.user_type == 'admin' %}
+            <a href="/dashboard3/" class="flex items-center px-6 py-2 hover:bg-teal-800">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25" />
+                  </svg>                          
+                   <span class="ml-1">Dashboard</span>
+            </a>
+            {% endif %}
+            {% if request.user.user_type != 'sales_agent' %}
+            <a href="/procurement/" class="flex items-center px-6 py-2 hover:bg-teal-800">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m20.893 13.393-1.135-1.135a2.252 2.252 0 0 1-.421-.585l-1.08-2.16a.414.414 0 0 0-.663-.107.827.827 0 0 1-.812.21l-1.273-.363a.89.89 0 0 0-.738 1.595l.587.39c.59.395.674 1.23.172 1.732l-.2.2c-.212.212-.33.498-.33.796v.41c0 .409-.11.809-.32 1.158l-1.315 2.191a2.11 2.11 0 0 1-1.81 1.025 1.055 1.055 0 0 1-1.055-1.055v-1.172c0-.92-.56-1.747-1.414-2.089l-.655-.261a2.25 2.25 0 0 1-1.383-2.46l.007-.042a2.25 2.25 0 0 1 .29-.787l.09-.15a2.25 2.25 0 0 1 2.37-1.048l1.178.236a1.125 1.125 0 0 0 1.302-.795l.208-.73a1.125 1.125 0 0 0-.578-1.315l-.665-.332-.091.091a2.25 2.25 0 0 1-1.591.659h-.18c-.249 0-.487.1-.662.274a.931.931 0 0 1-1.458-1.137l1.411-2.353a2.25 2.25 0 0 0 .286-.76m11.928 9.869A9 9 0 0 0 8.965 3.525m11.928 9.868A9 9 0 1 1 8.965 3.525" />
+                  </svg>                          
+                <span class="ml-1">Companies</span>
+            </a>
+            <a href="/inventory/" class="flex items-center px-6 py-2 hover:bg-teal-800">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
+                </svg>                          
+              <span class="ml-1">Inventory</span>
+            </a>
+            {% endif %}
+            {% if request.user.user_type != 'admin' %}
+            <a href="/products/" class="flex items-center px-6 py-2 hover:bg-teal-800">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3.75v16.5M2.25 12h19.5M6.375 17.25a4.875 4.875 0 0 0 4.875-4.875V12m6.375 5.25a4.875 4.875 0 0 1-4.875-4.875V12m-9 8.25h16.5a1.5 1.5 0 0 0 1.5-1.5V5.25a1.5 1.5 0 0 0-1.5-1.5H3.75a1.5 1.5 0 0 0-1.5 1.5v13.5a1.5 1.5 0 0 0 1.5 1.5Zm12.621-9.44c-1.409 1.41-4.242 1.061-4.242 1.061s-.349-2.833 1.06-4.242a2.25 2.25 0 0 1 3.182 3.182ZM10.773 7.63c1.409 1.409 1.06 4.242 1.06 4.242S9 12.22 7.592 10.811a2.25 2.25 0 1 1 3.182-3.182Z" />
+                  </svg>                          
+                <span class="ml-1">Products</span>
+            </a>
+            {% endif%}
+            {% if request.user.user_type != 'admin' %}
+            <a href="/sales/" class="flex items-center px-6
+             py-2 hover:bg-teal-800">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0 0 12 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 0 1-2.031.352 5.988 5.988 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971Zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 0 1-2.031.352 5.989 5.989 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971Z" />
+                  </svg>                          
+                <span class="ml-1">Sales</span> 
+            </a>
+            {% endif%}
+            {% if request.user.user_type != 'sales_agent' %}
+            <a href="/payments/" class="flex items-center px-6 py-2 hover:bg-teal-800">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
+                  </svg>                          
+                <span class="ml-1">Payments</span>
+            </a>
+            {% endif %}
+            {% if request.user.user_type != 'sales_agent' %}
+            <a href="/users/" class="flex items-center px-6 py-2 hover:bg-teal-800">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                </svg>                          
+              <span class="ml-1">Users</span>
+            </a>
+            {% endif %}
+            <a href="/logout/" onclick="return confirm('Are you sure you want to log out?');" class="flex items-center px-6 py-2 hover:bg-red-700">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 9V5.25A2.25 2.25 0 0110.5 3h6a2.25 2.25 0 012.25 2.25v13.5A2.25 2.25 0 0116.5 21h-6a2.25 2.25 0 01-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+              </svg>
+              <span class="ml-1">Logout</span>
+            </a>
+        </nav>
+        <div class="p-6 bg-teal-800">
+          <div class="flex items-center mt-auto space-x-3">
+            <div>
+                <p class="font-bold">{{ request.user.get_full_name }}</p>
+                <a href="admin-profile.html" class="hover:underline"><p class="text-sm text-yellow-300">{{ request.user.get_user_type_display }} - {{ request.user.branch.name }}</p></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex-1 ml-64 px-4 py-6 min-h-screen mt-6 bg-gray-100">
+        {% block content %}
+        <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
+        <div class="flex justify-between bg-gray-100 shadow p-4">
+            <!-- Left Section: Welcome Message -->
+            <div>
+              <h1 class="text-lg font-semibold">Hello, <span class="text-teal-700">{{ request.user.first_name }}!</span></h1>
+            </div>
+          
+            <!-- Center Section: Search Bar -->
+            <div class="flex-1 mx-6 max-w-md flex items-center px-4 py-2 rounded-lg shadow-inner">
+              <input
+                type="text"
+                placeholder="Search companies, users, products..."
+                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              />
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-teal-300 hover:text-teal-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M16.65 16.65A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+              </svg>
+            </div>
+          
+            <!-- Right Section: Date & Notifications -->
+            <div class="flex items-center space-x-4">
+              <p class="text-gray-600 text-sm hidden md:block">
+                <span id="currentDate"></span>
+              </p>
+              <button class="text-gray-500 hover:text-teal-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118.5 14V11a6.5 6.5 0 10-13 0v3c0 .417-.152.82-.405 1.138L4 17h5m6 0a3 3 0 11-6 0" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            <!-- Companies -->
+            {% comment "Dashboard metric cards with icons" %}
+            {% include 'partials/metrics.html' %}
+            {% endcomment %}
+            <div class="bg-white p-4 rounded-lg mt-10 shadow flex flex-col items-center text-center">
+              <a href="/procurement/" class="text-blue-500 hover:underline"><h2 class="text-lg font-semibold text-gray-700">Suppliers</h2></a>
+              <p class="text-3xl font-bold text-teal-600">{{total_companies}}</p>
+            </div>
+          
+            <!-- Users -->
+            <div class="bg-white p-4 rounded-lg shadow mt-10 flex flex-col items-center text-center">
+              <a href="/users/" class="text-blue-500 hover:underline"><h2 class="text-lg font-semibold text-gray-700">Users</h2></a> 
+              <p class="text-3xl font-bold text-teal-600">{{total_users}}</p>
+            </div>
+          
+            <!-- Products -->
+            <div class="bg-white p-4 rounded-lg mt-10 shadow flex flex-col items-center text-center">
+              <a href="/products/" class="text-blue-500 hover:underline"><h2 class="text-lg font-semibold text-gray-700">Products</h2></a>
+              <p class="text-3xl font-bold text-teal-600">{{total_products}}</p>
+            </div>
+          
+            <!-- Payments -->
+            <div class="bg-white p-4 rounded-lg mt-10 shadow flex flex-col items-center text-center">
+              <h2 class="text-lg font-semibold text-gray-700">Payments</h2>
+              <p class="text-3xl font-bold text-teal-600">UGX {{payments_this_month}}</p>
+            </div>
+          
+            <!-- Sales -->
+            <div class="bg-white p-4 rounded-lg mt-10 shadow flex flex-col items-center text-center">
+              <h2 class="text-lg font-semibold text-gray-700">Sales</h2>
+              <p class="text-3xl font-bold text-teal-600">{{sales_this_month}}</p>
+              <span class="text-sm text-gray-500">This month</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 mt-10 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Product Spotlight -->
+            <div class="bg-white p-4 rounded-lg shadow flex flex-col items-center text-center">
+              <img src="./imgs/products/beans-3.png" alt="Beans" class="w-24 h-24 object-cover rounded-full mb-3">
+
+              <h3 class="text-lg font-semibold">{{top_product.produce__name}} </h3>
+              <span class="text-gray-500">High Demand</span>
+              <p class="text-teal-600 font-bold mt-2">UGX {{top_product.produce__selling_price}}</p>
+            </div>
+          
+            <!-- Latest Sales -->
+            <div class="bg-white p-4 rounded-lg mt-10 shadow overflow-x-auto">
+              <h3 class="text-lg font-semibold mb-4 ">Latest Sales</h3>
+              <table class="w-full text-left">
+                <thead>
+                  <tr class="bg-gray-200 text-gray-600 uppercase text-xs leading-normal">
+                    <th class="py-3 px-4">Branch</th>
+                    <th class="py-3 px-4">Product</th>
+                    <th class="py-3 px-4">Price (UGX)</th>
+                  </tr>
+                </thead>
+                <tbody class="text-gray-600 text-sm divide-y divide-gray-200">
+                  {% for sale in latest_sales %}
+                  <tr>
+                    <td class="py-3 px-4">{{sale.branch.name}}</td>
+                    <td class="py-3 px-4">{{sale.produce.type}}</td>
+                    <td class="py-3 px-4">{{sale.total_amount}}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- Location / Staff Info -->
+            <div class="bg-white p-4 rounded-lg mt-10 shadow flex items-center space-x-4">
+              <img src="./imgs/profile-pics/prof-1.png" alt="Staff" class="h-14 w-14 rounded-full object-cover">
+              <div>
+                <h3 class="text-lg font-semibold">{{on_duty_user.get_full_name}}</h3>
+                <p class="text-gray-500 text-sm">{{on_duty_user.branch}}</p>
+              </div>
+            </div>
+          </div>
+          {% endblock %}
+      </div>
+    </div>
+
+    
+        
+  
+</body>
+
+</html>

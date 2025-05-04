@@ -1,0 +1,84 @@
+<!-- templates/director_dashboard.html -->
+{% extends "core/dashboard2.html" %}
+{% block title %}Director Overview - KGL{% endblock %}
+{% block content %}
+<div class="p-6 space-y-6">
+
+  <h1 class="text-2xl font-bold text-gray-800 mb-4">Welcome, Director Orban</h1>
+
+  <!-- BUSINESS OVERVIEW -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="bg-white p-4 rounded shadow flex items justify-between">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+        <div>
+            <p class="text-gray-600">Total Branches</p>
+            <p class="text-2xl font-bold text-teal-700">{{ total_branches }}</p>
+        </div>
+    </div>
+    <div class="bg-white p-4 rounded shadow flex justify-between">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5 text-green-500" strokeWidth={1.5} stroke="currentColor" className="size-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+          </svg>
+        <div>
+            <p class="text-gray-600">Total Users</p>
+            <p class="text-2xl font-bold text-teal-700">{{ total_users }}</p>
+        </div>
+      </div>
+    <div class="bg-white p-4 rounded shadow">
+        <div>
+            <p class="text-gray-600">Total Inventory Items</p>
+            <p class="text-2xl font-bold text-teal-700">{{ total_inventory }}</p>
+        </div>
+    </div>
+    <div class="bg-white p-4 rounded shadow">
+        <div>
+            <p class="text-gray-600">Current Stock Weight (KG)</p>
+            <p class="text-2xl font-bold text-teal-700">{{ total_stock }}</p>
+        </div>
+    </div>
+  </div>
+
+  <!-- SALES SUMMARY -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+    <div class="bg-white p-4 rounded shadow">
+      <h2 class="font-semibold text-lg mb-2">Sales Summary</h2>
+      <p><strong>Total Sales:</strong> UGX {{ total_sales }}</p>
+      <p><strong>This Month:</strong> UGX {{ sales_this_month }}</p>
+      <p><strong>Total Transactions:</strong> {{ total_transactions }}</p>
+    </div>
+
+    <div class="bg-white p-4 rounded shadow">
+      <h2 class="font-semibold text-lg mb-2">Top Branch</h2>
+      <p><strong>Name:</strong> {{ top_branch.name }}</p>
+      <p><strong>Sales:</strong> UGX {{ top_branch.sale__total_amount }}</p>
+    </div>
+  </div>
+
+  <!-- PROCUREMENT OVERVIEW -->
+  <div class="bg-white p-4 rounded shadow mt-6">
+    <h2 class="font-semibold text-lg mb-2">Procurement Overview</h2>
+    <p><strong>This Month:</strong> UGX {{ purchases_this_month }}</p>
+    <p><strong>Top Product:</strong> {{ top_product.produce__name }}</p>
+    <p><strong>Active Dealers:</strong> {{ top_dealer.dealer__name }}</p>
+  </div>
+
+  <!-- CREDIT SALES -->
+  <div class="bg-white p-4 rounded shadow mt-6">
+    <h2 class="font-semibold text-lg mb-2">Deferred Payments</h2>
+    <p><strong>Total Due:</strong> UGX {{ total_credit_due }}</p>
+    <p><strong>Trusted Buyers:</strong> {{ trusted_buyers }}</p>
+    <p><strong>Upcoming Due Dates:</strong> {{ upcoming_due_dates|length }}</p>
+  </div>
+
+  <!-- STAFF OVERVIEW -->
+  <div class="bg-white p-4 rounded shadow mt-6">
+    <h2 class="font-semibold text-lg mb-2">Staff Overview</h2>
+    <p><strong>Managers:</strong> {{ total_managers }}</p>
+    <p><strong>Sales Agents:</strong> {{ total_sales_agents }}</p>
+    <p><strong>On Duty Today:</strong> {{ on_duty_staff|join:", " }}</p>
+  </div>
+
+</div>
+{% endblock %}

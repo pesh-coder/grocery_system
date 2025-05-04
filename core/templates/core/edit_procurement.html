@@ -1,0 +1,71 @@
+{% extends "core/dashboard2.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Payment Details - KGL{% endblock %}
+{% load static %}
+{% block content %}
+<div class="flex justify-between items-center mb-4">
+    <h1 class="text-2xl font-bold">Supply Details</h1>
+    <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 flex items-center gap-2">
+        <a href="/procurement/">Supplier Companies</a>
+    </button>
+</div>
+<div>
+    <section class="flex flex-col items-center pt-6">
+        <div
+          class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+          <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+            <form class="space-y-4 md:space-y-6" method="POST" action="/procurement/edit/{{procurement.id}}/">
+                <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">Edit Procurement
+                  </h1>
+                {% csrf_token %}
+                {{ form|crispy }}
+              <button type="submit" class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none 
+              focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 
+              dark:hover:bg-blue-700 dark:focus:ring-blue-800">Save</button>
+            </form>
+            <script>
+              const produceData = JSON.parse('{{ produce_data|escapejs }}');
+          
+              document.addEventListener("DOMContentLoaded", function () {
+                  const produceSelect = document.getElementById("id_produce");
+                  const dealerSelect = document.getElementById("id_dealer");
+                  const costInput = document.getElementById("id_cost_per_unit");
+                  const quantityInput = document.getElementById("id_quantity");
+                  const totalCostInput = document.getElementById("id_total_cost");
+          
+                  function updateTotalCost() {
+                      const quantity = parseFloat(quantityInput.value) || 0;
+                      const cost = parseFloat(costInput.value) || 0;
+                      const total = quantity * cost;
+                      totalCostInput.value = total.toFixed(2);
+                  }
+          
+                  // When produce is selected
+                  produceSelect.addEventListener("change", function () {
+                      const selectedProduceId = this.value;
+                      const data = produceData[selectedProduceId];
+          
+                      if (data) {
+                          costInput.value = data.cost_per_unit;
+                          Array.from(dealerSelect.options).forEach(option => {
+                              option.selected = option.value == data.dealer;
+                          });
+                      } else {
+                          costInput.value = "";
+                          dealerSelect.selectedIndex = 0;
+                      }
+          
+                      updateTotalCost(); // recalculate total cost
+                  });
+          
+                  // Recalculate when quantity or cost changes
+                  quantityInput.addEventListener("input", updateTotalCost);
+                  costInput.addEventListener("input", updateTotalCost);
+              });
+          </script>                        
+          </div>
+        </div>
+      </section>
+{% endblock %}
+</body>
+</html>

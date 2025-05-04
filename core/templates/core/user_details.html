@@ -1,0 +1,53 @@
+{% extends "core/dashboard2.html" %}
+{% block title %}User Details - KGL{% endblock %}
+{% load static %}
+{% block content %}
+
+
+
+    <!-- Top Section: Back Button + Page Title -->
+    <div class="flex justify-between items-center mb-6">
+        <a href="/users/" class="text-teal-600 hover:text-teal-800 flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Back</span>
+        </a>
+        <h1 class="text-2xl font-bold text-gray-800">User Details</h1>
+        <a href="/edituser/{{ user.id }}/" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+            Edit User
+        </a>
+    </div>
+
+    <!-- Details Card -->
+    <div class="flex justify-center">
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <table class="w-full">
+                <tbody class="divide-y divide-gray-200 text-sm">
+                    <tr>
+                        <th class="text-left text-gray-500 bg-gray-50 uppercase tracking-wider px-6 py-4">Name</th>
+                        <td class="px-6 py-4 font-medium text-gray-700">{{ user.get_full_name }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-left text-gray-500 bg-gray-50 uppercase tracking-wider px-6 py-4">Email</th>
+                        <td class="px-6 py-4 text-gray-700">{{ user.email }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-left text-gray-500 bg-gray-50 uppercase tracking-wider px-6 py-4">Phone Number</th>
+                        <td class="px-6 py-4 text-gray-700">{{ user.phone_number }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-left text-gray-500 bg-gray-50 uppercase tracking-wider px-6 py-4">Role</th>
+                        <td class="px-6 py-4 text-gray-700">{{ user.get_user_type_display }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-left text-gray-500 bg-gray-50 uppercase tracking-wider px-6 py-4">Branch</th>
+                        <td class="px-6 py-4 text-gray-700">{{ user.branch.name }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+{% endblock %}

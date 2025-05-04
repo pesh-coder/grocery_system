@@ -1,0 +1,78 @@
+{% load crispy_forms_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KGL | Welcome</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+
+    }
+    label {
+      color: white !important;
+    }
+  </style>
+</head>
+<body class="h-screen bg-cover bg-center" style="background-image:url('/static/imgs/pb.png/'); background-color: rgba(0, 0, 0, 0.4);">
+
+  <div class="w-full min-h-screen bg-black bg-opacity-50 flex flex-col items-center justify-center pt-6 space-y-2">
+
+    <!-- Logo -->
+    <div>
+      <img src="{% static 'imgs/2.png' %}" alt="Karibu Groceries Logo" class="h-[240px] w-auto mx-auto">
+    </div>
+
+    <!-- LOGIN CARD: Dashboard-Matching Form -->
+    <div class="bg-[#0f766e] w-80 rounded-[20px] p-8 mb-10 shadow-lg text-white">
+      <h1 class="text-3xl font-bold mb-4 text-center">Welcome</h1>
+        {% if form.non_field_errors %}
+        <p id="login-error-msg" class="text-sm text-red-700 text-center mb-2">Invalid username or password</p>
+        {% endif %}
+      <form  method="POST" action="{% url 'login' %}" id="form">
+        {% csrf_token %}
+         <!-- Render username -->
+        <div class="mb-4">
+          <label for="{{ form.username.id_for_label }}" class="text-sm font-semibold"></label>
+          {{ form.username|as_crispy_field }}
+        </div>
+
+        <!-- Render password -->
+        <div class="mb-4">
+          <label for="{{ form.password.id_for_label }}" class="text-sm font-semibold"></label>
+          {{ form.password|as_crispy_field }}
+        </div>
+
+        <div class="text-right text-[10px] text-[#90cdf4] cursor-pointer mb-3">
+          Forgot Password?
+        </div>
+
+        <button type="submit" class="w-full h-10 rounded-md bg-yellow-100 text-[#0f766e] font-semibold shadow-md hover:bg-yellow-300">
+          Sign In
+        </button>
+      </form>
+      <p class="text-center text-sm text-white mt-4">
+        Don’t have an account?
+        <span class="text-[#90cdf4] cursor-pointer">Sign up</span>
+      </p>
+    </div>
+
+
+  </div>
+  <script>
+    // Hide error message after 5 seconds
+    setTimeout(() => {
+      const errorMsg = document.getElementById('login-error-msg');
+      if (errorMsg) {
+        errorMsg.style.transition = 'opacity 0.5s ease';
+        errorMsg.style.opacity = '0';
+        setTimeout(() => errorMsg.remove(), 500); // Remove it completely after fade
+      }
+    }, 5000);
+  </script>
+</body>
+</html>

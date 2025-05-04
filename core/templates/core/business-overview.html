@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Overview - KGL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="w-64 bg-teal-700 text-white flex flex-col fixed inset-y-0 left-0">
+            <div class="p-6">
+                <img src="imgs/Logos/2.png" alt="Karibu Groceries Limited logo" class="h-12">
+                <h2 class="text-xl font-bold mt-4">Director's Dashboard</h2>
+            </div>
+
+            <nav class="flex-1 px-4 space-y-2">
+                <a href="reports.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-teal-800">
+                    <span>Reports Dashboard</span>
+                </a>
+                <a href="business-overview.html" class="flex items-center px-4 py-2 bg-teal-800 rounded">
+                    <span>Business Overview</span>
+                </a>
+                <a href="sales-analytics.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-teal-800">
+                    <span>Sales Analytics</span>
+                </a>
+                <a href="inventory-status.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-teal-800">
+                    <span>Inventory Status</span>
+                </a>
+                <a href="financial-reports.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-teal-800">
+                    <span>Financial Reports</span>
+                </a>
+            </nav>
+
+            <div class="p-4">
+                <a href="index.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-red-700">
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 ml-64 overflow-y-auto">
+            <header class="bg-white shadow-sm">
+                <div class="max-w-7xl mx-auto py-4 px-6">
+                    <h1 class="text-2xl font-bold text-gray-900">Business Overview</h1>
+                </div>
+            </header>
+
+            <main class="max-w-7xl mx-auto py-6 px-6">
+                <!-- Company Performance Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow p-6 col-span-2">
+                        <h2 class="text-lg font-semibold mb-4">Company Performance Summary</h2>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Business Health Score</span>
+                                <div class="flex items-center">
+                                    <div class="w-32 h-2 bg-gray-200 rounded-full mr-2">
+                                        <div class="w-24 h-2 bg-green-500 rounded-full"></div>
+                                    </div>
+                                    <span class="text-green-600 font-medium">85%</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Growth Rate</span>
+                                <span class="text-green-600 font-medium">+15.2% YoY</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Customer Satisfaction</span>
+                                <span class="text-green-600 font-medium">4.8/5.0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-lg font-semibold mb-4">Quick Actions</h2>
+                        <div class="space-y-3">
+                            <button class="w-full bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700">Generate Full Report</button>
+                            <button class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Schedule Meeting</button>
+                            <button class="w-full bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">View Projections</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Business Goals -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-lg font-semibold mb-4">Business Goals Progress</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-gray-600">Revenue Target</span>
+                                    <span class="text-gray-600">75%</span>
+                                </div>
+                                <div class="w-full h-2 bg-gray-200 rounded-full">
+                                    <div class="w-3/4 h-2 bg-green-500 rounded-full"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-gray-600">Market Expansion</span>
+                                    <span class="text-gray-600">60%</span>
+                                </div>
+                                <div class="w-full h-2 bg-gray-200 rounded-full">
+                                    <div class="w-3/5 h-2 bg-blue-500 rounded-full"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-gray-600">Cost Reduction</span>
+                                    <span class="text-gray-600">90%</span>
+                                </div>
+                                <div class="w-full h-2 bg-gray-200 rounded-full">
+                                    <div class="w-11/12 h-2 bg-purple-500 rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-lg font-semibold mb-4">Key Initiatives</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-medium">Market Expansion</h3>
+                                    <p class="text-sm text-gray-500">New region entry planned</p>
+                                </div>
+                                <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">On Track</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-medium">Digital Transformation</h3>
+                                    <p class="text-sm text-gray-500">System upgrade in progress</p>
+                                </div>
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">In Progress</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-medium">Supplier Relations</h3>
+                                    <p class="text-sm text-gray-500">Contract negotiations</p>
+                                </div>
+                                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Planned</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Assessment -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-semibold mb-4">Risk Assessment</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 border rounded-lg">
+                            <h3 class="font-medium text-red-600 mb-2">High Risk</h3>
+                            <ul class="space-y-2 text-sm">
+                                <li>Market price fluctuations</li>
+                                <li>Supply chain disruptions</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 border rounded-lg">
+                            <h3 class="font-medium text-yellow-600 mb-2">Medium Risk</h3>
+                            <ul class="space-y-2 text-sm">
+                                <li>Seasonal demand variations</li>
+                                <li>Regulatory changes</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 border rounded-lg">
+                            <h3 class="font-medium text-green-600 mb-2">Low Risk</h3>
+                            <ul class="space-y-2 text-sm">
+                                <li>Customer retention</li>
+                                <li>Technology adoption</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Add any necessary JavaScript for interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize any interactive elements
+        });
+    </script>
+</body>
+</html> 

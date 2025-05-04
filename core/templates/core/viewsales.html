@@ -1,0 +1,103 @@
+{% extends "core/dashboard2.html" %}
+{% block title %}Sales - KGL{% endblock %}
+{% load static %}
+{% block content %}
+
+<!-- Header Actions -->
+<div class="flex justify-between items-center mb-6">
+  <div class="flex items-center space-x-4">
+    <a href="/sales/" class="text-teal-600 hover:text-teal-800 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+      Back
+    </a>
+    <h1 class="text-2xl font-bold">Sale Details</h1>
+  </div>
+
+  <a href="/sales/edit/{{sales.id}}/">
+    <button class="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      Edit Sale
+    </button>
+  </a>
+</div>
+
+<!-- Sale Detail Card -->
+<div class="bg-white rounded-lg shadow-md overflow-hidden">
+  <table class="w-full table-auto">
+    <tbody class="divide-y divide-gray-200 text-sm">
+      <tr>
+        <th class="px-6 py-3 text-gray-500 font-medium text-left bg-gray-50 w-1/3">Branch</th>
+        <td class="px-6 py-4">{{sales.branch.name}}</td>
+      </tr>
+      <tr>
+        <th class="px-6 py-3 text-gray-500 font-medium text-left bg-gray-50">Staff</th>
+        <td class="px-6 py-4">{{sales.sales_agent.get_full_name}} - {{sales.sales_agent.get_user_type_display}}</td>
+      </tr>
+      <tr>
+        <th class="px-6 py-3 text-gray-500 font-medium text-left bg-gray-50">Date</th>
+        <td class="px-6 py-4">{{sales.sale_date}}</td>
+      </tr>
+      <tr>
+        <th class="px-6 py-3 text-gray-500 font-medium text-left bg-gray-50">Product</th>
+        <td class="px-6 py-4">{{sales.produce.name}}</td>
+      </tr>
+      <tr>
+        <th class="px-6 py-3 text-gray-500 font-medium text-left bg-gray-50">Quantity (kg)</th>
+        <td class="px-6 py-4">{{sales.quantity}}</td>
+      </tr>
+      <tr>
+        <th class="px-6 py-3 text-gray-500 font-medium text-left bg-gray-50">Selling Price</th>
+        <td class="px-6 py-4">UGX {{sales.selling_price}}</td>
+      </tr>
+      <tr>
+        <th class="px-6 py-3 text-gray-500 font-medium text-left bg-gray-50">Total Amount</th>
+        <td class="px-6 py-4">UGX {{sales.total_amount}}</td>
+      </tr>
+      <tr>
+        <th class="px-6 py-3 text-gray-500 font-medium text-left bg-gray-50">Amount Received</th>
+        <td class="px-6 py-4">UGX {{sales.amount_received}}</td>
+      </tr>
+      {% if sales.change > 0 %}
+      <tr>
+        <th class="px-6 py-3 text-gray-500 font-medium text-left bg-gray-50">Change</th>
+        <td class="px-6 py-4">UGX {{sales.change}}</td>
+      </tr>
+      {% else %} 
+      <tr>
+        <th class="px-6 py-3 text-gray-500 font-medium text-left bg-gray-50">Change</th>
+        <td class="px-6 py-4">0</td>
+      </tr>
+      {% endif %}
+      <tr>
+        <th class="px-6 py-3 text-gray-500 font-medium text-left bg-gray-50">Status</th>
+        <td class="px-6 py-4">
+          {% if sales.is_paid %}
+            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">Paid</span>
+          {% elif sale.amount_received > 0 %}
+            <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-semibold">Partial</span>
+          {% else %}
+            <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold">Unpaid</span>
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th class="px-6 py-3 text-gray-500 font-medium text-left bg-gray-50">Payment Method</th>
+        <td class="px-6 py-4">{{sales.get_payment_method_display}}</td>
+      </tr>
+      <tr>
+        <th class="px-6 py-3 text-gray-500 font-medium text-left bg-gray-50">Customer</th>
+        <td class="px-6 py-4">{{sales.customer_name}}</td>
+      </tr>
+      <tr>
+        <th class="px-6 py-3 text-gray-500 font-medium text-left bg-gray-50">Customer's Phone</th>
+        <td class="px-6 py-4">{{sales.buyer_contact}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

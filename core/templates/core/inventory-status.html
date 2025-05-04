@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Status - KGL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="w-64 bg-teal-700 text-white flex flex-col fixed inset-y-0 left-0">
+            <div class="p-6">
+                <img src="imgs/Logos/2.png" alt="Karibu Groceries Limited logo" class="h-12">
+                <h2 class="text-xl font-bold mt-4">Director's Dashboard</h2>
+            </div>
+
+            <nav class="flex-1 px-4 space-y-2">
+                <a href="reports.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-teal-800">
+                    <span>Reports Dashboard</span>
+                </a>
+                <a href="business-overview.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-teal-800">
+                    <span>Business Overview</span>
+                </a>
+                <a href="sales-analytics.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-teal-800">
+                    <span>Sales Analytics</span>
+                </a>
+                <a href="inventory-status.html" class="flex items-center px-4 py-2 bg-teal-800 rounded">
+                    <span>Inventory Status</span>
+                </a>
+                <a href="financial-reports.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-teal-800">
+                    <span>Financial Reports</span>
+                </a>
+            </nav>
+
+            <div class="p-4">
+                <a href="index.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-red-700">
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 ml-64 overflow-y-auto">
+            <header class="bg-white shadow-sm">
+                <div class="max-w-7xl mx-auto py-4 px-6">
+                    <div class="flex justify-between items-center">
+                        <h1 class="text-2xl font-bold text-gray-900">Inventory Status</h1>
+                        <div class="flex items-center space-x-4">
+                            <button class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700">
+                                Download Inventory Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="max-w-7xl mx-auto py-6 px-6">
+                <!-- Inventory Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Total Stock Value</h3>
+                        <p class="text-2xl font-bold text-gray-900" id="totalStockValue">UGX 0</p>
+                        <p class="text-sm text-green-600">+5.2% vs last month</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Total Items</h3>
+                        <p class="text-2xl font-bold text-gray-900" id="totalItems">0</p>
+                        <p class="text-sm text-blue-600">5 categories</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Low Stock Items</h3>
+                        <p class="text-2xl font-bold text-gray-900" id="lowStockItems">0</p>
+                        <p class="text-sm text-red-600">Needs attention</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Stock Turnover Rate</h3>
+                        <p class="text-2xl font-bold text-gray-900">4.2x</p>
+                        <p class="text-sm text-green-600">Healthy rate</p>
+                    </div>
+                </div>
+
+                <!-- Stock Level Charts -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4">Stock Levels by Product</h3>
+                        <canvas id="stockLevelsChart"></canvas>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4">Stock Value Distribution</h3>
+                        <canvas id="stockValueChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Inventory Table -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold mb-4">Current Inventory</h3>
+                        <div class="flex justify-between mb-4">
+                            <form method="get">
+                            <input type="text" name="search" placeholder="Search products..." value="{{ request.GET.search }}" class="border rounded-md px-4 py-2 w-64">
+                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Search</button>
+                            </form>
+                            <!--no results from search -->
+                            {% if request.GET.search and not products %}
+                            <div class="text-center text-red-400 font-semibold mt-4">
+                                No results found for "{{ request.GET.search }}"
+                            </div>
+                            {% endif %} 
+                            <select class="border rounded-md px-4 py-2">
+                                <option value="all">All Categories</option>
+                                <option value="beans">Beans</option>
+                                <option value="maize">Maize</option>
+                                <option value="gnuts">G-nuts</option>
+                                <option value="cowpeas">Cow peas</option>
+                                <option value="soybeans">Soy beans</option>
+                            </select>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock Level (kg)</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value (UGX)</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="inventoryTable">
+                                    <!-- Table rows will be populated dynamically -->
+                                     {% for items in inventory %}
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.produce.name}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.produce.type}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.quantity}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">UGX {item.}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            {% if item.quantity == 0 %}
+                                            <span class="text-red-600 font-bold">Out of Stock</span>
+                                            {% elif item.quantity <= item.minimum_quantity %}
+                                            <span class="text-yellow-500 font-bold">Low Stock</span>
+                                            {% else %}
+                                            <span class="text-green-600 font-bold">In Stock</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4 text-gray-400">No inventory records available.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html> 

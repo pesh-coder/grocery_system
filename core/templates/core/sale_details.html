@@ -1,0 +1,44 @@
+{% extends "core/dashboard2.html" %}
+{% block title %}Sales - KGL{% endblock %}
+{% load static %}
+    {% block content %}
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Sale details</h1>
+        <a href="/sales/add/"><button class="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 flex items-center gap-2">
+            Edit Sale
+        </button></a>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm">
+        <table class="w-full">
+            <tbody class="bg-white divide-y divide-gray-200">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <td class="px-6 py-4 whitespace-nowrap">{{sale.sale_date}}</td>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                    <td class="px-6 py-4 whitespace-nowrap">{{sale.produce.name}}</td>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity (kg)</th>
+                    <td class="px-6 py-4 whitespace-nowrap">{{sale.quantity}}</td>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount (UGX)</th>
+                    <td class="px-6 py-4 whitespace-nowrap">{{sale.amount_paid}}</td>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
+                    <td class="px-6 py-4 whitespace-nowrap">{{sale.get_payment_method_display}}</td>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                    <td class="px-6 py-4 whitespace-nowrap">{{sale.customer_name}}</td>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {% if sale.is_paid %}
+                        <span class="bg-green-100 text-green-700 px-2 inline-flex text-xs leading-5 font-semibold rounded-full">Paid</span>
+                        {% elif sale.amount_paid > 0 %}
+                        <span class="bg-yellow-100 text-yellow-700 px-2 inline-flex text-xs leading-5 font-semibold rounded-full">Partial</span>
+                        {% else %}
+                        <span class="bg-red-100 text-red-700 px-2 inline-flex text-xs leading-5 font-semibold rounded-full">Unpaid</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endblock %}
+           
+</body>
+</html>

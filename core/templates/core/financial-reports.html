@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Reports - KGL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="w-64 bg-teal-700 text-white flex flex-col fixed inset-y-0 left-0">
+            <div class="p-6">
+                <img src="imgs/Logos/2.png" alt="Karibu Groceries Limited logo" class="h-12">
+                <h2 class="text-xl font-bold mt-4">Director's Dashboard</h2>
+            </div>
+
+            <nav class="flex-1 px-4 space-y-2">
+                <a href="reports.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-teal-800">
+                    <span>Reports Dashboard</span>
+                </a>
+                <a href="business-overview.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-teal-800">
+                    <span>Business Overview</span>
+                </a>
+                <a href="sales-analytics.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-teal-800">
+                    <span>Sales Analytics</span>
+                </a>
+                <a href="inventory-status.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-teal-800">
+                    <span>Inventory Status</span>
+                </a>
+                <a href="financial-reports.html" class="flex items-center px-4 py-2 bg-teal-800 rounded">
+                    <span>Financial Reports</span>
+                </a>
+            </nav>
+
+            <div class="p-4">
+                <a href="index.html" class="flex items-center px-4 py-2 text-white rounded hover:bg-red-700">
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 ml-64 overflow-y-auto">
+            <header class="bg-white shadow-sm">
+                <div class="max-w-7xl mx-auto py-4 px-6">
+                    <div class="flex justify-between items-center">
+                        <h1 class="text-2xl font-bold text-gray-900">Financial Reports</h1>
+                        <div class="flex items-center space-x-4">
+                            <select id="timeRange" class="border rounded-md px-4 py-2">
+                                <option value="month">This Month</option>
+                                <option value="quarter">This Quarter</option>
+                                <option value="year">This Year</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                            <button class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700">
+                                Export Financial Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="max-w-7xl mx-auto py-6 px-6">
+                <!-- Financial Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Total Revenue</h3>
+                        <p class="text-2xl font-bold text-gray-900" id="totalRevenue">UGX 0</p>
+                        <p class="text-sm text-green-600">+15.3% vs last period</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Gross Profit</h3>
+                        <p class="text-2xl font-bold text-gray-900" id="grossProfit">UGX 0</p>
+                        <p class="text-sm text-green-600">+12.8% vs last period</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Net Profit</h3>
+                        <p class="text-2xl font-bold text-gray-900" id="netProfit">UGX 0</p>
+                        <p class="text-sm text-green-600">+10.5% vs last period</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Profit Margin</h3>
+                        <p class="text-2xl font-bold text-gray-900">25.8%</p>
+                        <p class="text-sm text-green-600">+2.1% vs last period</p>
+                    </div>
+                </div>
+
+                <!-- Financial Charts -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4">Revenue vs Expenses</h3>
+                        <canvas id="revenueExpensesChart"></canvas>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4">Profit Trends</h3>
+                        <canvas id="profitTrendsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Financial Statements -->
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- Profit & Loss Statement -->
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold mb-4">Profit & Loss Statement</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount (UGX)</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">% of Revenue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200" id="plStatement">
+                                        <!-- P&L rows will be populated dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cash Flow -->
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold mb-4">Cash Flow Summary</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inflow (UGX)</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Outflow (UGX)</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net Flow (UGX)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200" id="cashFlowStatement">
+                                        <!-- Cash flow rows will be populated dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Initialize data when page loads
+        window.onload = function() {
+            updateFinancialData();
+            initializeCharts();
+        };
+
+        function updateFinancialData() {
+            // Sample financial data (replace with actual data from your system)
+            const financialData = {
+                revenue: 150000000,
+                grossProfit: 45000000,
+                netProfit: 30000000,
+                plStatement: [
+                    { category: 'Revenue', amount: 150000000, percentage: 100 },
+                    { category: 'Cost of Goods Sold', amount: 105000000, percentage: 70 },
+                    { category: 'Gross Profit', amount: 45000000, percentage: 30 },
+                    { category: 'Operating Expenses', amount: 15000000, percentage: 10 },
+                    { category: 'Net Profit', amount: 30000000, percentage: 20 }
+                ],
+                cashFlow: [
+                    { category: 'Operations', inflow: 150000000, outflow: 120000000 },
+                    { category: 'Investments', inflow: 0, outflow: 10000000 },
+                    { category: 'Financing', inflow: 20000000, outflow: 5000000 }
+                ]
+            };
+
+            // Update overview statistics
+            document.getElementById('totalRevenue').textContent = `UGX ${financialData.revenue.toLocaleString()}`;
+            document.getElementById('grossProfit').textContent = `UGX ${financialData.grossProfit.toLocaleString()}`;
+            document.getElementById('netProfit').textContent = `UGX ${financialData.netProfit.toLocaleString()}`;
+
+            // Update P&L statement
+            const plBody = document.getElementById('plStatement');
+            plBody.innerHTML = financialData.plStatement.map(item => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.category}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">UGX ${item.amount.toLocaleString()}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.percentage}%</td>
+                </tr>
+            `).join('');
+
+            // Update Cash Flow statement
+            const cfBody = document.getElementById('cashFlowStatement');
+            cfBody.innerHTML = financialData.cashFlow.map(item => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.category}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">UGX ${item.inflow.toLocaleString()}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">UGX ${item.outflow.toLocaleString()}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm ${item.inflow - item.outflow >= 0 ? 'text-green-600' : 'text-red-600'}">
+                        UGX ${(item.inflow - item.outflow).toLocaleString()}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function initializeCharts() {
+            // Revenue vs Expenses Chart
+            const revenueExpensesCtx = document.getElementById('revenueExpensesChart').getContext('2d');
+            new Chart(revenueExpensesCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [
+                        {
+                            label: 'Revenue',
+                            data: [25000000, 28000000, 24000000, 30000000, 22000000, 27000000],
+                            backgroundColor: 'rgb(13, 148, 136)'
+                        },
+                        {
+                            label: 'Expenses',
+                            data: [18000000, 20000000, 17000000, 22000000, 16000000, 19000000],
+                            backgroundColor: 'rgb(239, 68, 68)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+
+            // Profit Trends Chart
+            const profitTrendsCtx = document.getElementById('profitTrendsChart').getContext('2d');
+            new Chart(profitTrendsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [
+                        {
+                            label: 'Gross Profit',
+                            data: [7000000, 8000000, 7000000, 8000000, 6000000, 8000000],
+                            borderColor: 'rgb(13, 148, 136)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Net Profit',
+                            data: [5000000, 6000000, 5000000, 6000000, 4000000, 6000000],
+                            borderColor: 'rgb(59, 130, 246)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Handle time range changes
+        document.getElementById('timeRange').addEventListener('change', function(e) {
+            updateFinancialData();
+            // You would typically fetch new data here based on the selected range
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>KGL Receipt</title>
+  <script>
+    function printReceipt() {
+      window.print();
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white p-10 font-sans text-sm">
+  <div class="max-w-2xl mx-auto border border-gray-300 p-6 shadow-md">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-3xl font-bold text-blue-900">RECEIPT</h2>
+      <div class="flex justify-center mt-4"><img src="/static/imgs/bg1.png/" class="w-30 h-20 rounded-full border-4 border-white"
+        alt="Profile"></div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6 text-gray-700 mb-6">
+      <div>
+        <p class="font-bold">{{supply.dealer.name}}</p>
+        <p>{{supply.dealer.contact_person}}</p>
+      </div>
+      <div>
+        <p><span class="font-bold">Receipt #:</span> INT-{{supply.id}}</p>
+        <p><span class="font-bold">Receipt Date:</span>{{supply.actual_delivery_date}}</p>
+        <p><span class="font-bold">Branch:</span> {{supply.created_by.branch.name}}</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6 text-gray-700 mb-4">
+      <div>
+        <p class="font-bold">Bill To</p>
+        <p>{{supply.created_by.get_full_name}}</p>
+        <p>{{supply.created_by.user_type}}</p>
+      </div>
+    </div>
+
+    <table class="w-full text-left border-t border-b border-gray-300 mb-6">
+      <thead class="text-blue-900">
+        <tr>
+          <th class="py-2">QTY</th>
+          <th class="py-2">DESCRIPTION</th>
+          <th class="py-2">UNIT PRICE</th>
+          <th class="py-2">AMOUNT</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-t">
+          <td class="py-2">{{supply.quantity}}</td>
+          <td>{{supply.produce.name}}</td>
+          <td>{{supply.cost_per_unit}}</td>
+          <td>{{supply.get_total}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="flex justify-end text-right mb-8">
+      <div class="w-1/2">
+        <p class="text-lg font-bold text-blue-900 mt-2">TOTAL: UGX {{supply.get_total}}</p>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <p class="font-bold">TERMS & CONDITIONS</p>
+      <ul class="list-disc pl-5 space-y-2 text-sm text-gray-800">
+        <li>
+          Delivery must be completed by: <span class="font-semibold">{{ supply.expected_delivery_date }}</span>
+        </li>
+        <li>
+          Goods must match agreed <span class="font-semibold">quality and quantity</span>.
+        </li>
+        <li>
+          All invoices must include the <span class="font-semibold">Procurement ID</span> and be submitted within 
+          <span class="font-semibold">3 days</span>.
+        </li>
+        <li>
+          Payment will be processed within <span class="font-semibold">7–14 days</span> upon delivery confirmation.
+        </li>
+        <li>
+          For any issues, contact: <br>
+          <span class="font-semibold">Phone:</span> {{ supply.branch.phone_number }}<br>
+          <span class="font-semibold">Email:</span> {{ supply.branch.email }} <br>
+          <span class="font-semibold">{{ supply.branch.address }}</span><br>
+        </li>
+      </ul>
+    </div>
+
+    <div class="text-blue-900 font-bold text-xl mb-4">Thank you</div>
+    <p class="italic">{{supply.dealer.contact_person}}</p>
+
+    <div class="mt-6 text-center">
+      <button onclick="printReceipt()" class="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-full">Print Receipt</button>
+    </div>
+  </div>
+</body>
+</html>

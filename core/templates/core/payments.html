@@ -1,0 +1,147 @@
+{% extends "core/dashboard2.html" %}
+{% block title %}Payments - KGL{% endblock %}
+{% load static %}
+            {% block content %}
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold">Payment Management</h1>
+            </div>
+
+            <!-- Sales Overview Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500">Total Payments</p>
+                            <h3 class="text-2xl font-bold">{{ total_payments|floatformat:0 }}</h3>
+                        </div>
+                        <div class="bg-green-100 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500">Outstanding</p>
+                            {% if outstanding %}
+                            <h3 class="text-2xl font-bold">{{ outstanding |floatformat:0 }}</h3>
+                            {% else %}
+                            <h3 class="text-2xl font-bold">0</h3>
+                            {% endif %}
+                        </div>
+                        <div class="bg-blue-100 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500">Today</p>
+                            <h3 class="text-2xl font-bold">{{ todays_payments |floatformat:0 }}</h3>
+                        </div>
+                        <div class="bg-green-100 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Table -->
+            <div class="bg-white rounded-lg shadow-sm">
+                <div class="p-4 border-b border-gray-200 flex justify-between">
+                    <h2 class="text-xl font-semibold">Payment Transactions</h2>
+                    <!--no results from search -->
+                    {% if request.GET.search and not products %}
+                            <div class="text-center text-red-400 font-semibold mt-4">
+                                 No results found for "{{ request.GET.search }}"
+                            </div>
+                    {% endif %} 
+                    <form method="get" class="flex mb-4">
+                        <input type="text" name="search" placeholder="Search..." class="border p-2 rounded w-full" value="{{ request.GET.search }}">
+                        
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Search</button>
+                    </form> 
+                </div>
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount (UGX)</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for payment in payments %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap font-medium">PAY-2025-{{ forloop.counter }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ payment.sale_date|date:"Y-m-d H:i" }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ payment.customer_name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ payment.produce.name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ payment.total_amount|floatformat:0 }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">{{ payment.payment_method }}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if payment.is_paid == True %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Complete</span>
+                                {% else %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <a href="{% url 'payment_details' pk=payment.id %}"><button class="text-blue-600 hover:text-blue-900">View</button></a>
+                                <a href="{% url 'edit_payments' pk=payment.id %}"><button class="ml-3 text-red-600 hover:text-red-900">Edit</button></a>
+                                <a href="{% url 'pay_receipt' pk=payment.id %}"><button class="ml-3 text-green-600 hover:text-green-900">Receipt</button></a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-gray-400">No payments found.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <div class="px-6 py-4 border-t border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-gray-500">
+                            {% if page_obj.paginator.count > 0 %}
+                                {{ page_obj.start_index }} 
+                                to 
+                                {{ page_obj.end_index }} 
+                                of 
+                                {{ page_obj.paginator.count }}
+                            {% else %}
+                                0
+                            {% endif %}
+                            entries
+                        </div>
+                        <div class="flex space-x-2">
+                            {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 bg-gray-300 rounded-l hover:bg-gray-400"><button class="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50">Previous</button></a>
+                            {% endif %}
+                            <span><button class="px-3 py-1 border border-gray-300 rounded-md text-sm bg-purple-600 text-white">{{ page_obj.number }}</button></span>
+                            {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 bg-gray-300 rounded-r hover:bg-gray-400"><button class="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50">Next</button></a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+            
+</body>
+</html>

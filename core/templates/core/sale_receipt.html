@@ -27,7 +27,9 @@
         <p><span class="font-bold">Receipt #:</span> PAY-2025-{{sales.id}}</p>
         <p><span class="font-bold">Receipt Date:</span> {{sales.sale_date}}</p>
         <p><span class="font-bold">Location:</span> {{sales.sales_agent.branch.name}}</p>
+        {% if due_date %}
         <p><span class="font-bold">Due Date:</span> {{sales.due_date}}</p>
+        {% endif %}
       </div>
     </div>
 
@@ -46,7 +48,8 @@
           <th class="py-2">QTY</th>
           <th class="py-2">DESCRIPTION</th>
           <th class="py-2">UNIT PRICE</th>
-          <th class="py-2">AMOUNT</th>
+          <th class="py-2">TOTAL AMOUNT</th>
+          <th class="py-2">AMOUNT RECEIVED</th>
         </tr>
       </thead>
       <tbody>
@@ -55,6 +58,7 @@
           <td>{{sales.produce.name}}</td>
           <td>{{sales.selling_price}}</td>
           <td>{{sales.total_amount}}</td>
+          <td>{{sales.amount_received}}</td>
         </tr>
       </tbody>
     </table>

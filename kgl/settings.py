@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'core',
     'crispy_forms',
     'crispy_tailwind',
@@ -128,3 +129,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom user model
 AUTH_USER_MODEL = 'core.CustomUser'
+
+#This is where all my uploaded by django forms will go.
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

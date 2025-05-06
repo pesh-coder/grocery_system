@@ -2,9 +2,10 @@
 {% extends "core/dashboard2.html" %}
 {% block title %}Director Overview - KGL{% endblock %}
 {% block content %}
+{% load humanize %}
 <div class="p-6 space-y-6">
 
-  <h1 class="text-2xl font-bold text-gray-800 mb-4">Welcome, Director Orban</h1>
+  <h1 class="text-2xl font-bold text-gray-800 mb-4">Welcome, Director <span class="text-teal-600">{{request.user.last_name}}!</span></h1>
 
   <!-- BUSINESS OVERVIEW -->
   <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -35,7 +36,7 @@
     <div class="bg-white p-4 rounded shadow">
         <div>
             <p class="text-gray-600">Current Stock Weight (KG)</p>
-            <p class="text-2xl font-bold text-teal-700">{{ total_stock }}</p>
+            <p class="text-2xl font-bold text-teal-700">{{ total_stock|floatformat:2|intcomma }}</p>
         </div>
     </div>
   </div>
@@ -44,40 +45,40 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
     <div class="bg-white p-4 rounded shadow">
       <h2 class="font-semibold text-lg mb-2">Sales Summary</h2>
-      <p><strong>Total Sales:</strong> UGX {{ total_sales }}</p>
-      <p><strong>This Month:</strong> UGX {{ sales_this_month }}</p>
-      <p><strong>Total Transactions:</strong> {{ total_transactions }}</p>
+      <p><strong>Total Sales:</strong> UGX <span class="text-blue-400">{{ total_sales|floatformat:2|intcomma }}</span></p>
+      <p><strong>This Month:</strong> UGX <span class="text-blue-600">{{ sales_this_month }}</span></p>
+      <p><strong>Total Transactions:</strong> <span class="text-blue-800">{{ total_transactions }}</span></p>
     </div>
 
     <div class="bg-white p-4 rounded shadow">
       <h2 class="font-semibold text-lg mb-2">Top Branch</h2>
-      <p><strong>Name:</strong> {{ top_branch.name }}</p>
-      <p><strong>Sales:</strong> UGX {{ top_branch.sale__total_amount }}</p>
+      <p><strong>Name:</strong> <span class="text-green-500">{{ top_branch.name }}</span></p>
+      <p><strong>Sales:</strong> UGX <span class="text-green-600">{{ top_branch.sale__total_amount|floatformat:2|intcomma }}</span></p>
     </div>
   </div>
 
   <!-- PROCUREMENT OVERVIEW -->
   <div class="bg-white p-4 rounded shadow mt-6">
     <h2 class="font-semibold text-lg mb-2">Procurement Overview</h2>
-    <p><strong>This Month:</strong> UGX {{ purchases_this_month }}</p>
-    <p><strong>Top Product:</strong> {{ top_product.produce__name }}</p>
-    <p><strong>Active Dealers:</strong> {{ top_dealer.dealer__name }}</p>
+    <p><strong>This Month:</strong> UGX <span class="text-purple-400">{{ purchases_this_month|floatformat:2|intcomma }}</p></span>
+    <p><strong>Top Product:</strong> <span class="text-purple-600">{{ top_product.produce__name }}</p></span>
+    <p><strong>Active Dealers:</strong> <span class="text-purple-800">{{ top_dealer.dealer__name }}</p></span>
   </div>
 
   <!-- CREDIT SALES -->
   <div class="bg-white p-4 rounded shadow mt-6">
     <h2 class="font-semibold text-lg mb-2">Deferred Payments</h2>
-    <p><strong>Total Due:</strong> UGX {{ total_credit_due }}</p>
-    <p><strong>Trusted Buyers:</strong> {{ trusted_buyers }}</p>
-    <p><strong>Upcoming Due Dates:</strong> {{ upcoming_due_dates|length }}</p>
+    <p><strong>Total Due:</strong> UGX <span class="text-red-600">{{ total_credit_due|floatformat:2|intcomma }}</span></p>
+    <p><strong>Trusted Buyers:</strong><span class="text-green-500">{{ trusted_buyers }}</p></span> 
+    <p><strong>Upcoming Due Dates:</strong> <span class="text-red-800">{{ upcoming_due_dates|length }}</span></p>
   </div>
 
   <!-- STAFF OVERVIEW -->
   <div class="bg-white p-4 rounded shadow mt-6">
     <h2 class="font-semibold text-lg mb-2">Staff Overview</h2>
-    <p><strong>Managers:</strong> {{ total_managers }}</p>
-    <p><strong>Sales Agents:</strong> {{ total_sales_agents }}</p>
-    <p><strong>On Duty Today:</strong> {{ on_duty_staff|join:", " }}</p>
+    <p><strong>Managers:</strong><span class="text-yellow-500"> {{ total_managers }}</p></span>
+    <p><strong>Sales Agents:</strong><span class="text-yellow-600"> {{ total_sales_agents }}</p></span>
+    <p ><strong>On Duty Today:</strong> <span class="text-yellow-800">{{ on_duty_staff|join:", " }}</p></span>
   </div>
 
 </div>

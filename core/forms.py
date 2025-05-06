@@ -5,24 +5,6 @@ from crispy_forms.layout import Layout, Field, Submit
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm
-'''class ProductFilterForm(forms.Form):
-    type = forms.CharField(
-        required=False,
-        label='Filter by Type',
-        widget=forms.TextInput(attrs={'placeholder': 'Type', 'class': 'form-control'})
-    )
-    dealer = forms.CharField(
-        required=False,
-        label='Filter by Dealer',
-        widget=forms.TextInput(attrs={'placeholder': 'Dealer', 'class': 'form-control'})
-    )
-'''
-'''class SaleForm(forms.ModelForm):
-    class Meta:
-        model = Sale
-        fields = '__all__'
-
-'''
 
 class SaleForm(forms.ModelForm):
     class Meta:

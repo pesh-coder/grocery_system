@@ -1,6 +1,7 @@
 {% extends "core/dashboard2.html" %}
 {% block title %}Products - KGL{% endblock %}
 {% load static %}
+{% load humanize %}
         {% if messages %}
         <div id="success-message" class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg transition-opacity duration-500" role="alert">
         {% for message in messages %}
@@ -43,6 +44,7 @@
                 <table class="w-full border-collapse bg-white rounded-lg shadow-sm">
                     <thead>
                         <tr class="bg-yellow-300 text-left">
+                            <th class="p-3">Profile</th>
                             <th class="p-3">Product Name</th>
                             <th class="p-3">Type</th>
                             <th class="p-3">Buying Price (UGX)</th>
@@ -54,19 +56,22 @@
                     <tbody>
                         {% for product in products %}
                         <tr class="border-t">
-                            <td class="p-3">{{product.name}}</a></td>
+                            <td class="p-3"><a href="/products/{{product.id}}/"><img src="{{ product.image.url }}" alt="{{produce.name}}" class="h-10 w-10 rounded-full"></a></td>
+                            <td class="p-3">{{product.name}}</td>
                             <td class="p-3">{{product.type}}</td>
                             <td class="p-3">{{product.buying_price}}</td>
                             <td class="p-3">{{product.selling_price}}</td>
                             <td class="p-3">{{product.dealer}}</td>
                             <td class="p-3">
                                 {% if can_edit %}
-                                <a href="/products/edit/{{product.id}}/"><button class="text-blue-500 hover:underline">Edit</button></a>
-                                <a href="/products/delete/{{product.id}}/"><button class="text-red-500 hover:underline ml-1"
+                                <a href="/products/{{product.id}}/"><button class="text-green-600 hover:text-green-900">View</button></a>
+                                <a href="/products/edit/{{product.id}}/"><button class="text-blue-500 hover:text-blue-900 ml-1">Edit</button></a>
+                                <a href="/products/delete/{{product.id}}/"><button class="text-red-500 hover:text-red-900 ml-1"
                                     onclick="return confirm('Are you sure you want to delete this product?');">Delete</button></a>
                                 {% else %}    
-                                <span class="text-blue-300 cursor-not-allowed mr-2">Edit</span>
-                                <span class="text-red-300 cursor-not-allowed">Delete</span>
+                                <a href="/products/{{product.id}}/"><button class="text-green-600 hover:text-green-900 ">View</button></a>
+                                <span class="text-blue-300 cursor-not-allowed ml-1">Edit</span>
+                                <span class="text-red-300 cursor-not-allowed ml-1">Delete</span>
                                 {% endif %}
                             </td>
                         </tr>

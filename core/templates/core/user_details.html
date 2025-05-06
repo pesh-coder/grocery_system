@@ -13,41 +13,69 @@
             </svg>
             <span>Back</span>
         </a>
+        {% if request.user.user_type == 'manager' %}
         <h1 class="text-2xl font-bold text-gray-800">User Details</h1>
         <a href="/edituser/{{ user.id }}/" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
             Edit User
         </a>
+        {% else %}
+        <h1 class="text-2xl font-bold text-gray-800">User Details</h1>
+        <span class="bg-blue-500 text-white px-4 py-2 cursor-not-allowed">
+            Edit User
+        </span>
+        {% endif %}
     </div>
-
-    <!-- Details Card -->
-    <div class="flex justify-center">
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-            <table class="w-full">
-                <tbody class="divide-y divide-gray-200 text-sm">
-                    <tr>
-                        <th class="text-left text-gray-500 bg-gray-50 uppercase tracking-wider px-6 py-4">Name</th>
-                        <td class="px-6 py-4 font-medium text-gray-700">{{ user.get_full_name }}</td>
-                    </tr>
-                    <tr>
-                        <th class="text-left text-gray-500 bg-gray-50 uppercase tracking-wider px-6 py-4">Email</th>
-                        <td class="px-6 py-4 text-gray-700">{{ user.email }}</td>
-                    </tr>
-                    <tr>
-                        <th class="text-left text-gray-500 bg-gray-50 uppercase tracking-wider px-6 py-4">Phone Number</th>
-                        <td class="px-6 py-4 text-gray-700">{{ user.phone_number }}</td>
-                    </tr>
-                    <tr>
-                        <th class="text-left text-gray-500 bg-gray-50 uppercase tracking-wider px-6 py-4">Role</th>
-                        <td class="px-6 py-4 text-gray-700">{{ user.get_user_type_display }}</td>
-                    </tr>
-                    <tr>
-                        <th class="text-left text-gray-500 bg-gray-50 uppercase tracking-wider px-6 py-4">Branch</th>
+    <div class="grid grid-cols-2 md:grid-cols-1 gap-4 mb-6">
+        <div class="bg-gray-50 p-4 rounded-lg shadow">
+            <div class=" rounded-lg shadow mb-4 mt-1">
+                <div class="relative">
+                        <div class=" h-40 w-full overflow-hidden rounded-t-lg" >
+                            <div class="absolute inset-0 bg-black bg-opacity-30"></div><!--This div adds the opacity to the image below it-->
+                            <img class="w-full h-full object-cover" src="/static/imgs/pb.png/" alt="bg picture" />
+                        </div>
+                        <!-- trick centers the image horizontally -->
+                        <div class="absolute left-1/2 transform -translate-x-1/2 -bottom-6"><!-- -bottom 6 - overlaps the image downward-->
+                        <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="w-20 h-20 rounded-full border-4 border-white object-cover shadow-lg"
+                         alt="Profile">
+                        </div>
+                    </div>
+                   </div>
+            </div>
+          <div class="bg-white p-6 rounded-lg shadow mb-6 mt-2">
+            <h2 class="font-bold mb-4">{{ user.get_user_type_display }}</h2>
+            <form>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <tr>
+                            <th class="text-left font-bold text-gray-500 bg-gray-50 uppercase tracking-wider px-6 py-4"><span class="font-bold text-gray-500">Full Name:</span></th>
+                            <td class="px-6 py-4 font-medium text-gray-700">{{ user.get_full_name }}</td>
+                        </tr>  
+                    </div>
+                    <div>
+                        <tr>
+                            <th class="text-left font-bold text-gray-500 bg-gray-50 uppercase tracking-wider px-6 py-4"><span class="font-bold text-gray-500">Email:</span></th>
+                            <td class="px-6 py-4 text-gray-700">{{ user.email }}</td>
+                        </tr>
+                    </div>
+                    <div>
+                        <tr>
+                            <th class="text-left font-bold text-gray-500 bg-gray-50 uppercase tracking-wider px-6 py-4"><span class="font-bold text-gray-500">Phone Number:</span></th>
+                            <td class="px-6 py-4 text-gray-700">{{ user.phone_number }}</td>
+                        </tr>
+                    </div>
+                    <div>
+                        {% if user.branch.name %}
+                        <th class="text-left font-bold text-gray-500 bg-gray-50 uppercase tracking-wider px-6 py-4"><span class="font-bold text-gray-500">Branch: </span></th>
                         <td class="px-6 py-4 text-gray-700">{{ user.branch.name }}</td>
-                    </tr>
-                </tbody>
-            </table>
+                        {% endif %}
+                        
+                    </div>
+                </div>
+            </form>
+            </div>
         </div>
     </div>
+
 
 
 {% endblock %}

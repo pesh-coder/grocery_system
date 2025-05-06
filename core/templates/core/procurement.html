@@ -1,15 +1,26 @@
 {% extends "core/dashboard2.html" %}
 {% block title %}Payment Details - KGL{% endblock %}
+{% load humanize %}
 {% load static %}
         {% block content %}
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold">Supplier Companies</h1>
+                {% if request.user.user_type == 'manager' %}
                 <a href="/procurement/add/"><button class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 flex items-center gap-2">
+                   
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     Add New Supply
                 </button></a> 
+                {% else %}
+                <button class="bg-purple-600 text-white px-4 py-2 cursor-not-allowed rounded-lg hover:bg-purple-700 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add New Supply
+                </button> 
+                {% endif %}
             </div>
 
             <!-- Company Stats -->
@@ -46,7 +57,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-500">Purchases (This Month)</p>
-                            <h3 class="text-2xl font-bold">{{purchases_this_month}}</h3>
+                            <h3 class="text-2xl font-bold">{{purchases_this_month|floatformat:2|intcomma}}</h3>
                         </div>
                         <div class="bg-blue-100 p-3 rounded-full">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -112,26 +123,38 @@
                                             <div class="text-sm font-medium text-gray-900">{{ item.produce.name }}</div>
                                     </div>
                                 </td>
+                                {% if item.branch.name|lower == 'maganjo'%}
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ item.branch.name }}</span>
                                 </td>
+                                {% else %}
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-600">{{ item.dealer.name }}</span>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">{{ item.branch.name }}</span>
+                                </td>
+                                {% endif %}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold text-blue-800 rounded-full ">{{ item.dealer.name }}</span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-1">{{ item.quantity }}</span>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mr-1">{{ item.quantity }}</span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">{{ item.cost_per_unit }}</span>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full  text-xs font-medium">{{ item.cost_per_unit|floatformat:2|intcomma}}</span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.total_cost }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-800 text-gray-500">{{ item.total_cost|floatformat:2|intcomma }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.expected_delivery_date }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.actual_delivery_date|default:"Pending" }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    {% if request.user.user_type == 'manager' %}
                                     <a href="/procurement/view/{{item.id}}/" class="text-indigo-600 hover:text-indigo-900 mr-3">View</a>
                                     <a href="/procurement/receipt/{{item.id}}/" class="text-green-600 hover:text-green-900 mr-3">Receipt</a>
                                     <a href="/procurement/delete/{{item.id}}/" class="text-red-600 hover:text-red-900" 
                                     onclick="return confirm('Are you sure you want to delete this procurement?');">Delete</a>
+                                    {% else %}
+                                    <a href="/procurement/view/{{item.id}}/" class="text-indigo-600 hover:text-indigo-900 mr-3">View</a>
+                                    <span class="text-green-200 cursor-not-allowed mr-3">Receipt</span>
+                                    <span class="text-red-200 cursor-not-allowed">Delete</span>
+                                    {% endif %}
                                 </td>
                             </tr>
                             {% empty %}

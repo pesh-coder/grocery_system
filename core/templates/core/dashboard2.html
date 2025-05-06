@@ -1,3 +1,4 @@
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -100,9 +101,18 @@
         </nav>
         <div class="p-6 bg-teal-800">
           <div class="flex items-center mt-auto space-x-3">
+            {% if request.user.profile_picture %}
+              <img src="{{ request.user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="h-10 w-10 rounded-full">
+            {% else %}
+             <img src="/static/imgs/bg1.png/" alt="Default" class="h-10 w-10 rounded-full">
+            {% endif %}
             <div>
-                <p class="font-bold">{{ request.user.get_full_name }}</p>
-                <a href="admin-profile.html" class="hover:underline"><p class="text-sm text-yellow-300">{{ request.user.get_user_type_display }} - {{ request.user.branch.name }}</p></a>
+              <p class="font-bold">{{ request.user.get_full_name }}</p>
+              {% if request.user.user_type != 'admin' %}
+              <a href="" class="hover:underline"><p class="text-sm text-yellow-300">{{ request.user.get_user_type_display }} - {{ request.user.branch.name }}</p></a>
+              {% else %}
+              <a href="" class="hover:underline"><p class="text-sm text-yellow-300">{{ request.user.get_user_type_display }}</p></a>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -117,16 +127,43 @@
             </div>
           
             <!-- Center Section: Search Bar -->
-            <div class="flex-1 mx-6 max-w-md flex items-center px-4 py-2 rounded-lg shadow-inner">
-              <input
-                type="text"
-                placeholder="Search companies, users, products..."
-                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-              />
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-teal-300 hover:text-teal-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M16.65 16.65A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
-              </svg>
-            </div>
+            <div class="w-full max-w-lg mx-auto px-4">
+              {% if request.user.user_type == 'manager' %}
+                <form action="{% url 'global_search' %}" method="get" class="flex items-center bg-white border border-gray-300 rounded-full shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-teal-500">
+                  
+                  <!-- Input field -->
+                  <input
+                    type="text"
+                    name="q"
+                    placeholder="Search suppliers, users, products..."
+                    class="flex-grow px-5 py-2 text-gray-700 placeholder-gray-400 focus:outline-none"
+                  />
+              
+                  <!-- Search button with icon -->
+                  <button type="submit" class="px-4 text-teal-500 hover:text-teal-600 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M16.65 16.65A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+                    </svg>
+                  </button>
+                </form>
+              {% else %}
+                <form class="flex items-center bg-white border border-gray-300 rounded-full shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-teal-500">
+                  <!-- Input field -->
+                  <input
+                    type="text"
+                    name="q"
+                    placeholder="Search companies, users, products..."
+                    class="flex-grow px-5 py-2 text-gray-700 placeholder-gray-400 focus:outline-none"
+                  />
+                  <!-- Search button with icon -->
+                  <span class="px-4 text-teal-500 hover:text-teal-600 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 cursor-not-allowed" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M16.65 16.65A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+                    </svg>
+                  </span>
+                </form>
+              {% endif %}
+            </div>            
           
             <!-- Right Section: Date & Notifications -->
             <div class="flex items-center space-x-4">
@@ -142,9 +179,6 @@
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             <!-- Companies -->
-            {% comment "Dashboard metric cards with icons" %}
-            {% include 'partials/metrics.html' %}
-            {% endcomment %}
             <div class="bg-white p-4 rounded-lg mt-10 shadow flex flex-col items-center text-center">
               <a href="/procurement/" class="text-blue-500 hover:underline"><h2 class="text-lg font-semibold text-gray-700">Suppliers</h2></a>
               <p class="text-3xl font-bold text-teal-600">{{total_companies}}</p>
@@ -165,7 +199,8 @@
             <!-- Payments -->
             <div class="bg-white p-4 rounded-lg mt-10 shadow flex flex-col items-center text-center">
               <h2 class="text-lg font-semibold text-gray-700">Payments</h2>
-              <p class="text-3xl font-bold text-teal-600">UGX {{payments_this_month}}</p>
+              <p class="text-3xl font-bold text-teal-600">UGX {{payments_this_month|floatformat:2|intcomma}}</p>
+              <span class="text-sm text-gray-500">This month</span>
             </div>
           
             <!-- Sales -->
@@ -177,12 +212,16 @@
           </div>
           <div class="grid grid-cols-1 mt-10 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Product Spotlight -->
-            <div class="bg-white p-4 rounded-lg shadow flex flex-col items-center text-center">
-              <img src="./imgs/products/beans-3.png" alt="Beans" class="w-24 h-24 object-cover rounded-full mb-3">
+            <div class="bg-white p-4 rounded-lg shadow flex justify-center flex-col items-center text-center">
+              {% if top_product and top_product.image %}
+                <img src="{{ top_product.image.url }}" alt="{{ top_product.name }}" class="h-20 w-20 object-cover rounded-full mx-auto">
+              {% else %}
+                <img src="/static/imgs/bg1.png/" alt="Default" class="h-20 w-20 object-cover rounded-full mx-auto">
+              {% endif %}
 
-              <h3 class="text-lg font-semibold">{{top_product.produce__name}} </h3>
+              <h3 class="text-lg font-semibold">{{top_product.name}} </h3>
               <span class="text-gray-500">High Demand</span>
-              <p class="text-teal-600 font-bold mt-2">UGX {{top_product.produce__selling_price}}</p>
+              <p class="text-teal-600 font-bold mt-2">UGX {{top_product.selling_price}}</p>
             </div>
           
             <!-- Latest Sales -->
@@ -190,7 +229,7 @@
               <h3 class="text-lg font-semibold mb-4 ">Latest Sales</h3>
               <table class="w-full text-left">
                 <thead>
-                  <tr class="bg-gray-200 text-gray-600 uppercase text-xs leading-normal">
+                  <tr class="bg-teal-200 text-gray-600 uppercase text-xs leading-normal">
                     <th class="py-3 px-4">Branch</th>
                     <th class="py-3 px-4">Product</th>
                     <th class="py-3 px-4">Price (UGX)</th>
@@ -209,11 +248,14 @@
             </div>
             
             <!-- Location / Staff Info -->
-            <div class="bg-white p-4 rounded-lg mt-10 shadow flex items-center space-x-4">
-              <img src="./imgs/profile-pics/prof-1.png" alt="Staff" class="h-14 w-14 rounded-full object-cover">
+            <div class="bg-white p-4 rounded-lg mt-10 shadow flex flex-col text-center justify-center items-center space-x-4">
+              <h3 class="text-lg font-semibold mb-4 ">Staff on Duty</h3>
+              <div class="mt-1">
+                <img src="{{on_duty_user.profile_picture.url}}" alt="Staff" class="h-14 w-14 rounded-full object-cover">
               <div>
                 <h3 class="text-lg font-semibold">{{on_duty_user.get_full_name}}</h3>
                 <p class="text-gray-500 text-sm">{{on_duty_user.branch}}</p>
+              </div>
               </div>
             </div>
           </div>

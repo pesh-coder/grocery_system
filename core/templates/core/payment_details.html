@@ -12,6 +12,7 @@
     </a>
     <h1 class="text-2xl font-bold">Payment Details</h1>
     <div></div>  <!-- Filler to keep spacing consistent -->
+    {% if request.user.user_type == 'manager' %}
     <a href="/payments/edit/{{payments.id}}/">
         <button class="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -20,6 +21,14 @@
           Edit Payment
         </button>
       </a>
+      {% else %}
+        <button class="bg-teal-600 text-white px-4 py-2 cursor-not-allowed flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Edit Payment
+        </button>
+      {% endif %}
 </div>
 
 <div class="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -32,6 +41,12 @@
             <tr>
                 <th class="bg-gray-50 px-6 py-4 text-left text-gray-600">Date</th>
                 <td class="px-6 py-4">{{ payments.sale_date|date:"F j, Y, g:i a" }}</td>
+            </tr>
+            <tr>
+                {% if payments.due_date %}
+                <th class="bg-gray-50 px-6 py-4 text-left text-gray-600">Due Date</th>
+                <td class="px-6 py-4 text-red-600 font-semibold"> UGX {{ payments.due_date|date:"F j, Y" }}</td>
+                {% endif %}
             </tr>
             <tr>
                 <th class="bg-gray-50 px-6 py-4 text-left text-gray-600">Customer</th>
@@ -62,8 +77,10 @@
                 <td class="px-6 py-4 font-semibold text-teal-700">UGX {{ payments.amount_received|floatformat:0 }}</td>
             </tr>
             <tr>
+                {% if outstanding %}
                 <th class="bg-gray-50 px-6 py-4 text-left text-gray-600">Payment Due (UGX)</th>
                 <td class="px-6 py-4 text-red-600 font-semibold">UGX {{ outstanding|floatformat:0 }}</td>
+                {% endif %}
             </tr>
             <tr>
                 <th class="bg-gray-50 px-6 py-4 text-left text-gray-600">Method</th>

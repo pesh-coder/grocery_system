@@ -27,7 +27,9 @@
         <p><span class="font-bold">Receipt #:</span> PAY-2025-{{payments.id}}</p>
         <p><span class="font-bold">Receipt Date:</span> {{payments.sale_date}}</p>
         <p><span class="font-bold">Location:</span> {{payments.sales_agent.branch.name}}</p>
+        {% if due_date %}
         <p><span class="font-bold">Due Date:</span> {{payments.due_date}}</p>
+        {% endif %}
       </div>
     </div>
 
@@ -46,7 +48,8 @@
           <th class="py-2">QTY</th>
           <th class="py-2">DESCRIPTION</th>
           <th class="py-2">UNIT PRICE</th>
-          <th class="py-2">AMOUNT</th>
+          <th class="py-2">TOTAL AMOUNT</th>
+          <th class="py-2">AMOUNT RECEIVED</th>
         </tr>
       </thead>
       <tbody>
@@ -55,6 +58,7 @@
           <td>{{payments.produce.name}}</td>
           <td>{{payments.selling_price}}</td>
           <td>{{payments.total_amount}}</td>
+          <td>{{payments.amount_received}}</td>
         </tr>
       </tbody>
     </table>
@@ -65,7 +69,7 @@
         {% if payments.is_paid %}
         <p class="text-xs font-bold text-red-900 mt-2">Change: UGX{{payments.change}}</p>
         {% else %}
-        <p class="text-xs font-bold text-red-900 mt-2">Payment Due: <span class="text-xs font-bold text-red-500" >UGX{{outstanding}}</span></p>
+        <p class="text-xs font-bold text-red-900 mt-2">Amount Due: <span class="text-xs font-bold text-red-500" >UGX{{outstanding}}</span></p>
         {% endif %}
       </div>
     </div>

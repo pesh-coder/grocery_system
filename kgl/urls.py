@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from core import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
@@ -24,7 +26,8 @@ urlpatterns = [
     path('', views.Login, name='login'),  # Login page
      path('logout/',views.Logout, name='logout'),
     path('signup/', views.signup, name='signup'),
-
+    #global search for the dashboard
+    path('search/', views.global_search, name='global_search'),
     path('dashboard3/', views.admin, name='dashboard3'),  # Owner
     path('dashboard2/', views.branch, name='dashboard2'),  # Manager and Sales agent
     #This is the path for the home page
@@ -35,6 +38,8 @@ urlpatterns = [
     path('products/edit/<int:pk>/', views.edit_product, name='edit_product'),
     path('products/delete/<int:pk>/', views.delete_product, name='delete_product'),
     path('products/add/', views.add_product, name='add_product'),
+    path('products/<int:pk>/', views.product_detail, name='product_detail'),
+
 
     #This is the path for inventory
     path('inventory-status/', views.inventory_status, name='inventory_status'),
@@ -71,5 +76,7 @@ urlpatterns = [
     path('viewuser/<int:pk>/', views.viewuser, name='viewuser'),
     path('edituser/<int:pk>/', views.edituser, name='edituser'),
 
-]
+
+
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

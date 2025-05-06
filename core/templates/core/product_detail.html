@@ -1,0 +1,71 @@
+<!-- core/product_detail.html -->
+{% extends "core/dashboard2.html" %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<div class="flex justify-start mb-4">
+  <a href="/products/" class="text-teal-600 hover:text-teal-800 flex items-center gap-1">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+    </svg>
+    <span>Back</span>
+  </a>
+</div>
+<div class="bg-white p-8 rounded-lg shadow-md max-w-6xl mx-auto mt-4">
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-2 items-start">
+      <!-- Images -->
+    <div class="w-full h-full flex">  <!-- You can adjust the height as needed -->
+        {% if product.image %}
+        <img src="{{ product.image.url }}"
+            alt="{{ product.name }} Main Image"
+            class="w-full max-w-[450px] h-auto object-cover rounded shadow">
+        {% else %}
+        <img src="/static/imgs/bg1.png/"
+            alt="Default Image"
+            class="w-full max-w-[450px] h-auto object-cover rounded shadow">
+        {% endif %}
+    </div>
+    <!-- Details -->
+    <div>
+      <h3 class="text-3xl font-bold">{{ product.name }}</h3>
+      {% if is_top_seller %}
+      <p class="text-yellow-500 mt-2">★★★★★ <span class="text-sm text-gray-500">High Demand</span></p>
+      {% else %}
+      <p class="text-yellow-500 mt-2">★★★★ <span class="text-sm text-gray-500">Normal</span></p>
+      {% endif%}
+      <p class="text-gray-600 mt-4">
+        Premium-quality {{ product.name|lower }} sourced from trusted local farmers.
+        Carefully sorted and cleaned for freshness. Suitable for both retail and bulk purchases.
+      </p>
+
+      <p class="text-2xl font-bold text-gray-800 mt-4">UGX {{ product.selling_price|floatformat:0|intcomma }} per kg</p>
+
+      <div class="mt-4 space-x-2">
+        <button class="px-4 py-2 border rounded bg-gray-100 font-medium">1 kg / UGX {{ product.selling_price|floatformat:0|intcomma }}</button>
+      </div>
+
+      <div class="mt-4 flex items-center gap-2">
+        <a href="/sales/add/"><button class="bg-black text-white px-6 py-2 rounded shadow">Sell Product</button></a>
+      </div>
+
+      <div class="mt-4 text-sm text-gray-600">
+        <p><strong>Branch:</strong> {{ product.dealer.branch.name }}</p>
+        <p><strong>Supplier:</strong> {{ product.dealer.name }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Benefits -->
+  <div class="mt-10">
+    <h4 class="text-lg font-semibold mb-2">Benefits</h4>
+    <ul class="list-disc ml-6 text-gray-700 space-y-1">
+      <li>Organically grown</li>
+      <li>High yield variety</li>
+      <li>Clean and sorted</li>
+      <li>Ready for immediate use</li>
+    </ul>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,6 +1,7 @@
 {% extends "core/dashboard2.html" %}
 {% block title %}Payments - KGL{% endblock %}
 {% load static %}
+{% load humanize %}
             {% block content %}
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold">Payment Management</h1>
@@ -12,7 +13,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-500">Total Payments</p>
-                            <h3 class="text-2xl font-bold">{{ total_payments|floatformat:0 }}</h3>
+                            <h3 class="text-2xl font-bold">{{ total_payments|floatformat:2|intcomma}}</h3>
                         </div>
                         <div class="bg-green-100 p-3 rounded-full">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -27,7 +28,7 @@
                         <div>
                             <p class="text-gray-500">Outstanding</p>
                             {% if outstanding %}
-                            <h3 class="text-2xl font-bold">{{ outstanding |floatformat:0 }}</h3>
+                            <h3 class="text-2xl font-bold">{{ outstanding |floatformat:2|intcomma }}</h3>
                             {% else %}
                             <h3 class="text-2xl font-bold">0</h3>
                             {% endif %}
@@ -44,7 +45,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-500">Today</p>
-                            <h3 class="text-2xl font-bold">{{ todays_payments |floatformat:0 }}</h3>
+                            <h3 class="text-2xl font-bold">{{ todays_payments|floatformat:2|intcomma}}</h3>
                         </div>
                         <div class="bg-green-100 p-3 rounded-full">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -59,17 +60,15 @@
             <div class="bg-white rounded-lg shadow-sm">
                 <div class="p-4 border-b border-gray-200 flex justify-between">
                     <h2 class="text-xl font-semibold">Payment Transactions</h2>
-                    <!--no results from search -->
-                    {% if request.GET.search and not products %}
-                            <div class="text-center text-red-400 font-semibold mt-4">
-                                 No results found for "{{ request.GET.search }}"
-                            </div>
-                    {% endif %} 
-                    <form method="get" class="flex mb-4">
-                        <input type="text" name="search" placeholder="Search..." class="border p-2 rounded w-full" value="{{ request.GET.search }}">
-                        
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Search</button>
-                    </form> 
+                    <div class="flex space-x-2">
+                        <form method="get" class="flex items-center mb-4">
+                            <select name="status" onchange="this.form.submit()" class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-teal-500">
+                              <option value="all" {% if selected_status == "all" %}selected{% endif %}>All</option>
+                              <option value="complete" {% if selected_status == "complete" %}selected{% endif %}>Complete</option>
+                              <option value="pending" {% if selected_status == "pending" %}selected{% endif %}>Pending</option>
+                            </select>
+                          </form>                          
+                    </div>
                 </div>
                 <table class="w-full">
                     <thead class="bg-gray-50">
@@ -89,11 +88,11 @@
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap font-medium">PAY-2025-{{ forloop.counter }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ payment.sale_date|date:"Y-m-d H:i" }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ payment.customer_name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ payment.produce.name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ payment.total_amount|floatformat:0 }}</td>
+                            <td class="px-6 py-4 text-blue-800 whitespace-nowrap">{{ payment.customer_name }}</td>
+                            <td class="px-6 py-4 text-green-800 whitespace-nowrap">{{ payment.produce.name }}</td>
+                            <td class="px-6 py-4 text-yellow-800 whitespace-nowrap">{{ payment.total_amount|floatformat:2|intcomma }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">{{ payment.payment_method }}</span>
+                                <span class="px-2 inline-flex leading-5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">{{ payment.payment_method }}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 {% if payment.is_paid == True %}
@@ -103,9 +102,15 @@
                                 {% endif %}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                {% if request.user.user_type == 'manager' %}
                                 <a href="{% url 'payment_details' pk=payment.id %}"><button class="text-blue-600 hover:text-blue-900">View</button></a>
                                 <a href="{% url 'edit_payments' pk=payment.id %}"><button class="ml-3 text-red-600 hover:text-red-900">Edit</button></a>
                                 <a href="{% url 'pay_receipt' pk=payment.id %}"><button class="ml-3 text-green-600 hover:text-green-900">Receipt</button></a>
+                                {% else %}
+                                <a href="{% url 'payment_details' pk=payment.id %}"><button class="text-blue-600 hover:text-blue-900">View</button></a>
+                                <span class="ml-3 text-red-200 cursor-not-allowed">Edit</span></a>
+                                <span class="ml-3 text-green-300 cursor-not-allowed">Receipt</span></a>
+                                {% endif %}
                             </td>
                         </tr>
                         {% empty %}

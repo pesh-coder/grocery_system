@@ -14,6 +14,7 @@ class CustomUser(AbstractUser):
 
     phone_number = models.CharField(max_length=15, blank=True)
     user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES, default='sales_agent')
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     branch = models.ForeignKey('Branch', on_delete=models.SET_NULL, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -67,6 +68,7 @@ class Produce(models.Model):
 
     name = models.CharField(max_length=200)
     type = models.CharField(max_length=100, choices=PRODUCE_TYPE_CHOICES)
+    image = models.ImageField(upload_to='produce_images/', null=True, blank=True)
     buying_price = models.DecimalField(max_digits=10, decimal_places=2)
     selling_price = models.DecimalField(max_digits=10, decimal_places=2)
     dealer = models.ForeignKey(Dealer, on_delete=models.SET_NULL, null=True)
@@ -109,6 +111,7 @@ class Inventory(models.Model):
     minimum_quantity = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     last_updated = models.DateTimeField(auto_now=True)
 
+    #It ensures that for any given (produce, branch) combo, only one row exists.
     class Meta:
         unique_together = ('produce', 'branch')
 
@@ -120,9 +123,6 @@ class Inventory(models.Model):
     def is_low_stock(self):
         return self.quantity < self.minimum_quantity
     
-    '''def is_in_stock(self):
-        return self.quantity >= self.minimum_quantity
-    '''
     def stock_status(self):
         if self.quantity == 0:
             return "Out of Stock"

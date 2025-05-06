@@ -17,81 +17,122 @@ from datetime import date
 from decimal import Decimal
 from django.core.serializers.json import DjangoJSONEncoder
 import json
+
 # Create your views here.
 
+TRUST_THRESHOLD = 3 
 
 #This is the path for dashboard page
-#@login_required
+@login_required
+ 
+
 def admin(request):
     sales = Sale.objects.all()
     today = date.today()
+
+    # Monthly sales count
     sales_this_month = sales.filter(
         sale_date__year=today.year,
         sale_date__month=today.month
     ).count()
+
     total_sales = sum(
         [sale.total_amount for sale in sales if sale.amount_received >= sale.total_amount],
         Decimal('0.00')
-        )
-    #for the CustomUser 
+    )
+
     User = get_user_model()
-
     total_stock = Inventory.objects.aggregate(total=Sum('quantity'))['total'] or 0
-    today = date.today()
 
+    # Top branch logic
     top_branch = (
         Branch.objects
         .annotate(
-            monthly_sales=Sum(
+            sale__total_amount=Sum(
                 'sale__total_amount',
                 filter=Q(sale__sale_date__year=today.year, sale__sale_date__month=today.month)
             )
         )
-        .order_by('-monthly_sales')
+        .order_by('-sale__total_amount')
         .first()
     )
 
-    
     procurements = Procurement.objects.select_related('produce', 'branch', 'dealer').all()
     purchases_this_month = procurements.filter(
         actual_delivery_date__year=today.year,
         actual_delivery_date__month=today.month
     ).aggregate(total=Sum('total_cost'))['total'] or 0
+
     top_product = (
-    procurements.filter(
-        actual_delivery_date__year=today.year,
-        actual_delivery_date__month=today.month
+        procurements.filter(
+            actual_delivery_date__year=today.year,
+            actual_delivery_date__month=today.month
+        )
+        .values('produce__name')
+        .annotate(total_quantity=Sum('quantity'))
+        .order_by('-total_quantity')
+        .first()
     )
-    .values('produce__name')  # or 'produce' if you want the ID
-    .annotate(total_quantity=Sum('quantity'))
-    .order_by('-total_quantity')
-    .first()
-    )
+
     top_dealer = (
-    procurements.filter(
-        actual_delivery_date__year=today.year,
-        actual_delivery_date__month=today.month
-    )
-    .values('dealer__name')
-    .annotate(total_supplied=Sum('quantity'))  # or Sum('total_cost') for value
-    .order_by('-total_supplied')
-    .first()
+        procurements.filter(
+            actual_delivery_date__year=today.year,
+            actual_delivery_date__month=today.month
+        )
+        .values('dealer__name')
+        .annotate(total_supplied=Sum('quantity'))
+        .order_by('-total_supplied')
+        .first()
     )
 
+    # Credit: Total Due (sum where amount_received < total)
+    total_credit_due = Sale.objects.filter(
+        is_paid=False
+    ).aggregate(total_due=Sum(F('total_amount') - F('amount_received')))['total_due'] or 0
 
-    context = { 'sales': sales,
-               'total_sales' : total_sales,
-               'sales_this_month':sales_this_month,
-               'total_transactions': sales.count(),
-               'total_branches':Branch.objects.count(),
-               'total_users':User.objects.count(),
-               'total_inventory':Inventory.objects.count(),
-               'total_stock': total_stock,
-               'top_branch': top_branch,
-               'purchases_this_month':purchases_this_month,
-               'top_product':top_product,
-               'top_dealer':top_dealer,
+    # Trusted Buyers: group by customer_name with 3+ successful transactions
+    trusted_buyers = (
+        Sale.objects.filter(is_paid=True)
+        .values('customer_name')
+        .annotate(count=Count('id'))
+        .filter(count__gte=TRUST_THRESHOLD)
+        .count()
+    )
+
+    # Upcoming Due Dates: within next 7 days
+    upcoming_due_dates = Sale.objects.filter(
+        is_paid=False,
+        due_date__range=[today, today + timedelta(days=7)]
+    )
+
+    # Staff Counts
+    total_managers = User.objects.filter(user_type='manager').count()
+    total_sales_agents = User.objects.filter(user_type='sales_agent').count()
+
+    # On-Duty Today (users who logged in today — assumes you track login)
+    on_duty_staff = User.objects.filter(last_login__date=today).values_list('first_name', flat=True)
+
+    context = {
+        'sales': sales,
+        'total_sales': total_sales,
+        'sales_this_month': sales_this_month,
+        'total_transactions': sales.count(),
+        'total_branches': Branch.objects.count(),
+        'total_users': User.objects.count(),
+        'total_inventory': Inventory.objects.count(),
+        'total_stock': total_stock,
+        'top_branch': top_branch,
+        'purchases_this_month': purchases_this_month,
+        'top_product': top_product,
+        'top_dealer': top_dealer,
+        'total_credit_due': total_credit_due,
+        'trusted_buyers': trusted_buyers,
+        'upcoming_due_dates': upcoming_due_dates,
+        'total_managers': total_managers,
+        'total_sales_agents': total_sales_agents,
+        'on_duty_staff': list(on_duty_staff),
     }
+
     return render(request, 'core/dashboard3.html', context)
 @login_required
 def branch(request):
@@ -120,17 +161,29 @@ def branch(request):
     ).count()
 
     # Top Selling Product
-    top_product = Sale.objects.filter(
+    #Filters sales for the current month.
+    top_product_data = Sale.objects.filter(
         sale_date__month=today.month
-    ).values('produce__name', 'produce__selling_price').annotate(
+    #Groups results by produce__name and produce__selling_price    
+    ).values('produce__id','produce__name', 'produce__selling_price').annotate(
+        #Annotates each group with total_quantity.
         total_quantity=Sum('quantity')
-    ).order_by('-total_quantity').first()
+    #Orders by highest quantity.
+    ).order_by('-total_quantity').first() #Returns the top one.
+
+    top_product = None
+    if top_product_data:
+        top_product = Produce.objects.filter(id=top_product_data['produce__id']).first()
 
     # Latest Sales
     latest_sales = Sale.objects.order_by('-sale_date')[:5]
 
-    # On-Duty Staff (temporary static for now)
-    on_duty_user = CustomUser.objects.first()
+    # This will get the most recently active sales agent (based on last_login) in the same branch as the currently logged-in user.
+    user = request.user
+    on_duty_user = CustomUser.objects.filter(
+        branch=user.branch,
+        user_type='sales_agent'
+    ).order_by('-last_login').first()
 
     user = request.user
 
@@ -147,6 +200,44 @@ def branch(request):
         }
 
     return render(request, 'core/dashboard2.html', context)
+
+@login_required
+def global_search(request):
+    query = request.GET.get('q', '')
+    users = products = suppliers = []
+
+    if query:
+        users = CustomUser.objects.filter(
+            Q(username__icontains=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query)
+        )
+
+        products = Produce.objects.filter(
+            Q(name__icontains=query) |
+            Q(type__icontains=query)
+        )
+
+        suppliers = Procurement.objects.filter(
+            Q(dealer__name__icontains=query) 
+        )
+
+    # 🔁 Redirect if only one result exists
+    if users.count() == 1 and products.count() == 0 and suppliers.count() == 0:
+        return redirect('viewuser', pk=users.first().id)
+    elif products.count() == 1 and users.count() == 0 and suppliers.count() == 0:
+        return redirect('product_detail', pk=products.first().id)
+    elif suppliers.count() == 1 and users.count() == 0 and products.count() == 0:
+        return redirect('view_procurement', pk=suppliers.first().id)    
+
+    context = {
+        'query': query,
+        'users': users,
+        'products': products,
+        'suppliers': suppliers
+    }
+
+    return render(request, 'core/search_results.html', context)
 
 def Logout(request):
     return render(request, 'core/logout.html')
@@ -228,11 +319,7 @@ def edituser(request, pk):
 @login_required
 def products_list(request):
 
-    user = request.user
-    if user.user_type == 'admin':
-        products = Produce.objects.all()
-    else:
-        products = Produce.objects.filter(dealer__branch=user.branch) 
+    products = Produce.objects.all()
 
     
     product_filter = request.GET.get('product')
@@ -253,6 +340,32 @@ def products_list(request):
         can_edit = False  # Sales Agent cannot edit or delete
     
     return render(request, 'core/products.html', {'products': products, 'product_names': product_names, 'selected_product': product_filter, 'can_edit': can_edit})
+
+#product details.
+@login_required
+def product_detail(request, pk):
+    product = get_object_or_404(Produce, pk=pk)
+    today = date.today()
+    # Top Selling Product
+    #Filters sales for the current month.
+    top_product_data = Sale.objects.filter(
+        sale_date__month=today.month
+    #Groups results by produce__name and produce__selling_price    
+    ).values('produce__id','produce__name', 'produce__selling_price').annotate(
+        #Annotates each group with total_quantity.
+        total_quantity=Sum('quantity')
+    #Orders by highest quantity.
+    ).order_by('-total_quantity').first() #Returns the top one. #with - DESCENDING from top to bottom
+    '''
+    This means that the one with the highest number of kgs bought in a month will be listed first
+    '''
+
+    is_top_seller = False
+    if top_product_data:
+        # Check if the current product is the top-selling one
+        is_top_seller = (product.id == top_product_data['produce__id'])
+
+    return render(request, 'core/product_detail.html', {'product': product, 'is_top_seller':is_top_seller })
 
 #edit your products
 @login_required
@@ -386,11 +499,15 @@ def add_procurement(request):
 
             min_qty = form.cleaned_data.get('minimum_quantity') or 10  # fallback to 10 if not set
             # After saving procurement, update inventory
+            '''when get_or_create() is called, Django uses 
+            this constraint (class Meta:unique_together = ('produce', 'branch'))
+            to avoid duplicates.'''
             inventory, created = Inventory.objects.get_or_create(
                 produce=procurement.produce,
                 branch=procurement.branch,
                 defaults={'quantity': 0, 'minimum_quantity': min_qty}
             )
+            
             #This automatically updates the quantity in the inventory avoiding duplicates
             inventory.quantity += procurement.quantity
             inventory.save()
@@ -454,120 +571,109 @@ def delete_procurement(request, pk):
 @login_required
 def viewstock(request):
     user = request.user
-    if user.user_type == 'admin':
-        stock = Inventory.objects.all()
-    else:
-        stock = Inventory.objects.filter(branch=user.branch)
+    selected_status = request.GET.get('status', 'all')
 
+    # Base queryset
+    if user.user_type == 'admin':
+        stock_queryset = Inventory.objects.select_related('produce', 'branch')
+    else:
+        stock_queryset = Inventory.objects.select_related('produce', 'branch').filter(branch=user.branch)
+
+    # Apply Python-level status filtering (because stock_status is not a DB field)
+    if selected_status != 'all':
+        filtered_stock = [item for item in stock_queryset if item.stock_status() == selected_status]
+    else:
+        filtered_stock = list(stock_queryset)
+
+    # Totals
     if user.user_type == 'admin':
         total_products = Procurement.objects.select_related('produce', 'branch', 'dealer').count()
-        total_quantity = Inventory.objects.aggregate(total=Sum('quantity'))['total'] or 0
-        total_stock = stock.count()
-        low_stock_count = stock.filter(quantity__lt=F('minimum_quantity')).count()
-        out_of_stock_count = stock.filter(quantity=0, branch=user.branch).count()
+        total_quantity = sum([item.quantity for item in filtered_stock])
+        total_stock = len(filtered_stock)
+        low_stock_count = stock_queryset.filter(quantity__lt=F('minimum_quantity')).count()
+        out_of_stock_count = stock_queryset.filter(quantity=0).count()
     else:
-        total_products = Procurement.objects.select_related('produce', 'branch', 'dealer').filter(branch=user.branch).count() 
-        total_quantity = stock.filter(branch=user.branch).aggregate(total=Sum('quantity'))['total'] or 0
-        total_stock = stock.filter(branch=user.branch).count()
-        low_stock_count = stock.filter(quantity__lt=F('minimum_quantity'), branch=user.branch).count()
-        out_of_stock_count = stock.filter(quantity=0, branch=user.branch).count()
+        total_products = Procurement.objects.select_related('produce', 'branch', 'dealer').filter(branch=user.branch).count()
+        total_quantity = sum([item.quantity for item in filtered_stock])
+        total_stock = len(filtered_stock)
+        low_stock_count = stock_queryset.filter(quantity__lt=F('minimum_quantity')).count()
+        out_of_stock_count = stock_queryset.filter(quantity=0).count()
 
-    query = request.GET.get('search')
-
-    if query:
-        query = query.lower() #converts string to lower case to avoid inconsistencies and bugs
-        if query in ["in stock", "low stock", "out of stock"]:
-        # First filter all records
-            stock = [item for item in stock if item.stock_status().lower() == query]
-        else:
-            stock = stock.filter(
-            Q(produce__name__icontains=query) |
-            Q(branch__name__icontains=query) |
-            Q(quantity__icontains=query)
-            )
-    #pagination
-    #Take this entire QuerySet and break it into chunks of 10.
-    paginator = Paginator(stock, 10)  # 10 sales per page
+    # Pagination
+    paginator = Paginator(filtered_stock, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    context = {'stock': page_obj, 
-               'page_obj': page_obj, 
-               'total_stock':total_stock, 
-               'total_products':total_products,
-               'low_stock_count':low_stock_count,
-               'out_of_stock_count':out_of_stock_count,
-               'total_quantity':total_quantity
-               }
+
+    context = {
+        'stock': page_obj,
+        'page_obj': page_obj,
+        'total_stock': total_stock,
+        'total_products': total_products,
+        'low_stock_count': low_stock_count,
+        'out_of_stock_count': out_of_stock_count,
+        'total_quantity': total_quantity,
+        'selected_status': selected_status,
+    }
     return render(request, 'core/viewstock.html', context)
 
 
 #This view is for payments
 @login_required
 def payments_list(request):
-
     user = request.user
+    status_filter = request.GET.get('status', 'all')  # New filter
+
+    # Base queryset
     if user.user_type == 'admin':
-        sales = Sale.objects.all()
+        sales_queryset = Sale.objects.all()
     else:
-        sales = Sale.objects.filter(branch=user.branch)
+        sales_queryset = Sale.objects.filter(branch=user.branch)
 
+    # Apply filter
+    if status_filter == 'complete':
+        sales_queryset = sales_queryset.filter(is_paid=True)
+    elif status_filter == 'pending':
+        sales_queryset = sales_queryset.filter(is_paid=False)
 
-    
-
+    # Stats
     total_payments = sum(
-        [sale.total_amount for sale in sales if sale.amount_received >= sale.total_amount],
+        [sale.total_amount for sale in sales_queryset if sale.amount_received >= sale.total_amount],
         Decimal('0.00')
-        )
-    # Today's Payments 
+    )
     todays_payments = sum(
-        [sale.total_amount for sale in sales if sale.sale_date.date() == date.today() and sale.amount_received >= sale.total_amount],
+        [sale.total_amount for sale in sales_queryset if sale.sale_date.date() == date.today() and sale.amount_received >= sale.total_amount],
         Decimal('0.00')
-        )
+    )
+    outstanding = sum(
+        [sale.total_amount - sale.amount_received for sale in sales_queryset if sale.amount_received < sale.total_amount],
+        Decimal('0.00')
+    )
 
-    # Outstanding (sum of total_amount - amount_paid for unpaid or partially paid sales)
-    outstanding = sum([
-        sale.total_amount - sale.amount_received
-        for sale in sales
-        if sale.amount_received < sale.total_amount
-    ], Decimal('0.00'))
-
-
-
-    paginator = Paginator(sales, 10)  # 10 sales per page
+    # Pagination
+    paginator = Paginator(sales_queryset, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    '''payments = Sale.objects.values(
-        'customer_name',
-        'produce__name',   # Product name
-        'payment_method',
-        'is_paid',
-        'pk',
-    ).annotate(
-        total_amount=Sum('amount_paid'),
-        sale_date=Min('sale_date')  # Optional: earliest sale date
-    ).order_by('-sale_date')
-'''
+    # Optional search query (you may choose to update this too)
     query = request.GET.get('search')
-    payments = sales.all()
-
+    payments = sales_queryset
     if query:
         payments = payments.filter(
             Q(payment_method__icontains=query) |
             Q(produce__name__icontains=query) |
-            Q(is_paid__icontains=query) |
             Q(customer_name__icontains=query)
         )
+
     context = {
         'sales': page_obj,
+        'page_obj': page_obj,
+        'payments': payments,
         'total_payments': total_payments,
         'outstanding': outstanding,
         'todays_payments': todays_payments,
-        'page_obj': page_obj,
-        'payments': payments,
+        'selected_status': status_filter,  # Important for keeping the dropdown selection
     }
     return render(request, 'core/payments.html', context)
-
 
 
 @login_required
@@ -584,7 +690,7 @@ def payment_details(request, pk):
 
     return render(request, 'core/payment_details.html', {'payments': payments, 'outstanding':outstanding })
 
-
+@login_required
 def pay_receipt (request, pk):
     user = request.user
     if user.user_type == 'admin':
@@ -595,7 +701,7 @@ def pay_receipt (request, pk):
 
     outstanding = payments.total_amount - payments.amount_received  
     return render (request, 'core/pay_receipt.html', {'payments': payments, 'outstanding':outstanding })
-
+@login_required
 def edit_payments (request, pk):
     user = request.user
     if user.user_type == 'admin':
@@ -616,7 +722,7 @@ def edit_payments (request, pk):
                 inventory = Inventory.objects.get(produce=updated_sale.produce, branch=updated_sale.branch)
             except Inventory.DoesNotExist:
                 messages.error(request, "Inventory not found for this produce and branch.")
-                return redirect('edit_sale', pk=pk)
+                return redirect('payments_list', pk=pk)
 
             # Calculate quantity difference
             quantity_diff = updated_sale.quantity - sale.quantity
@@ -624,15 +730,15 @@ def edit_payments (request, pk):
             # Check if enough stock is available if quantity increased
             if quantity_diff > 0 and inventory.quantity < quantity_diff:
                 messages.error(request, f"Only {inventory.quantity} kg in stock. Cannot increase sale.")
-                return redirect('edit_sale', pk=pk)
+                return redirect('payments_list', pk=pk)
 
             # Adjust inventory
             inventory.quantity -= quantity_diff
             inventory.save()
             updated_sale.save()
 
-            messages.success(request, "Sale updated successfully.")
-            return redirect('sales_list')
+            messages.success(request, "Payment updated successfully.")
+            return redirect('payments_list')
     else:
         form = SaleForm(instance=sale)
     produces = Produce.objects.all()
@@ -694,7 +800,7 @@ def sales_list(request):
 
     return render(request, 'core/sales.html', context)
 
-#@login_required
+@login_required
 def view_sale(request, pk):
     user = request.user
     if user.user_type == 'admin':
@@ -714,7 +820,7 @@ def sale_receipt(request, pk):
     outstanding = sales.total_amount - sales.amount_received
     return render(request, 'core/sale_receipt.html', {'sales': sales, 'outstanding':outstanding})
 
-
+@login_required
 def add_sale(request):
     if request.method == 'POST':
         form = SaleForm(request.POST)
@@ -807,7 +913,7 @@ def edit_sale(request, pk):
     produce_data = {str(p.id): float(p.selling_price) for p in produces}
     return render(request, 'core/editsale.html', {'sales': sales, 'form':form, 'produce_prices': json.dumps(produce_data, cls=DjangoJSONEncoder)})
 
-#@login_required
+@login_required
 def reports_view(request):
     sales = Sale.objects.all()
 
@@ -851,7 +957,7 @@ def reports_view(request):
 
     return render(request, 'core/reports.html', context)
 
-#@login_required
+@login_required
 def sales_analytics(request):
     period = request.GET.get('period', 'this_month')
 
@@ -944,7 +1050,7 @@ def inventory_status(request):
     return render(request, 'core/inventory-status.html', context)
 
 
-#@login_required
+@login_required
 def financial_reports(request):
     today = date.today()
     sales = Sale.objects.all()

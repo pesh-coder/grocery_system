@@ -258,10 +258,10 @@ def Login(request):
                 else:
                     return redirect('/login/')  # fallback
         else:
-            return render(request, 'core/login.html', {'form': form, 'error': 'Invalid credentials'})
+            return render(request, 'core/index.html', {'form': form, 'error': 'Invalid credentials'})
     else:
         form = AuthenticationForm()
-    return render(request, 'core/login.html', {'form': form})
+    return render(request, 'core/index.html', {'form': form})
 
 def signup(request):
     if request.method == 'POST':

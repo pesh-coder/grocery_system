@@ -24,7 +24,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.Login, name='login'),  # Login page
-     path('logout/',views.Logout, name='logout'),
+    path('logout/',views.Logout, name='logout'),
     path('signup/', views.signup, name='signup'),
     #global search for the dashboard
     path('search/', views.global_search, name='global_search'),
@@ -79,4 +79,9 @@ urlpatterns = [
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if not settings.DEBUG:
+    urlpatterns += [
+        path('ping/', health_check, name='ping'),
+    ]
 

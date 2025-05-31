@@ -76,12 +76,10 @@ urlpatterns = [
     path('viewuser/<int:pk>/', views.viewuser, name='viewuser'),
     path('edituser/<int:pk>/', views.edituser, name='edituser'),
 
+    #health check
+    path('ping/', health_check, name='ping'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-if not settings.DEBUG:
-    urlpatterns += [
-        path('ping/', health_check, name='ping'),
-    ]
 

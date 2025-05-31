@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum, Count
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .models import *
 from .forms import *
 from datetime import date
@@ -17,7 +17,6 @@ from datetime import date
 from decimal import Decimal
 from django.core.serializers.json import DjangoJSONEncoder
 import json
-
 # Create your views here.
 
 TRUST_THRESHOLD = 3 
@@ -134,6 +133,12 @@ def admin(request):
     }
 
     return render(request, 'core/dashboard3.html', context)
+
+
+# health check
+def health_check(request):
+    return JsonResponse({"status": "ok", "message": "Healthy"})
+
 @login_required
 def branch(request):
     

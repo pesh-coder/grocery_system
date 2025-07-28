@@ -166,26 +166,26 @@ def branch(request):
     ).count()
 
     # Top Selling Product
-# Top Selling Product with fallback
-top_product_data = Sale.objects.filter(
-    sale_date__month=today.month
-).values('produce__id', 'produce__name', 'produce__selling_price').annotate(
-    total_quantity=Sum('quantity')
-).order_by('-total_quantity').first()
-
-# Fallback to all-time if no sales this month
-if not top_product_data:
-    top_product_data = Sale.objects.values('produce__id', 'produce__name', 'produce__selling_price').annotate(
+    # Top Selling Product with fallback
+    top_product_data = Sale.objects.filter(
+        sale_date__month=today.month
+    ).values('produce__id', 'produce__name', 'produce__selling_price').annotate(
         total_quantity=Sum('quantity')
     ).order_by('-total_quantity').first()
 
-# Fetch the actual Produce object
-top_product = None
-if top_product_data:
-    try:
-        top_product = Produce.objects.get(id=top_product_data['produce__id'])
-    except Produce.DoesNotExist:
-        top_product = None
+    # Fallback to all-time if no sales this month
+    if not top_product_data:
+        top_product_data = Sale.objects.values('produce__id', 'produce__name', 'produce__selling_price').annotate(
+            total_quantity=Sum('quantity')
+        ).order_by('-total_quantity').first()
+
+    # Fetch the actual Produce object
+    top_product = None
+    if top_product_data:
+        try:
+            top_product = Produce.objects.get(id=top_product_data['produce__id'])
+        except Produce.DoesNotExist:
+            top_product = None
 
     # Latest Sales
     latest_sales = Sale.objects.order_by('-sale_date')[:5]

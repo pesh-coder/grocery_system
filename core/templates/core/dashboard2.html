@@ -217,7 +217,7 @@
               {% if top_product and top_product.image %}
                 <img src="{{ top_product.image.url }}" alt="{{ top_product.name }}" class="h-20 w-20 object-cover rounded-full mx-auto">
               {% else %}
-                <img src="/static/imgs/bg1.png" alt="Default" class="h-20 w-20 object-cover rounded-full mx-auto">
+                <img src="{% static 'imgs/bg1.png' %}" alt="Default" class="h-20 w-20 object-cover rounded-full mx-auto">
               {% endif %}
 
               <h3 class="text-lg font-semibold">{{top_product.name}} </h3>
